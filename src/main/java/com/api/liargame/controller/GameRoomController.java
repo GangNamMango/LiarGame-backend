@@ -1,5 +1,6 @@
 package com.api.liargame.controller;
 
+import com.api.liargame.controller.dto.request.EnterRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -16,11 +17,13 @@ public class GameRoomController {
   private final SimpMessagingTemplate webSocket;
 
   @MessageMapping(value = "/enter")
-  public void enter() { //TODO : DTO 생성 필요
-    System.out.println("enter room socket test");
+  public void enter(EnterRequestDto enterRequestDto) {
+    String roomId = enterRequestDto.getRoomId();
+    //roomId의 GameRoom이 존재하는지 확인
+    //Room이 존재하면 /sub/game/:roomId로 ResponseDto<GameRoomDto> return
   }
 
-  @PostMapping("room")
+  @PostMapping("/room")
   public void createRoom() {
     System.out.println("create room api test");
   }
