@@ -54,4 +54,8 @@ public class User {
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
   }
+
+  private void update() {
+    setUpdatedAt(LocalDateTime.now());
+  }
 }

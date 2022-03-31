@@ -11,7 +11,7 @@ import lombok.Getter;
 public class GameRoom {
   private final String roomId;
   private final Set<User> users = new HashSet<>();
-  private final User host;
+  private User host;
   private Setting settings;
   private final LocalDateTime createdAt;
   private LocalDateTime updatedAt;
@@ -33,11 +33,23 @@ public class GameRoom {
     this.users.add(user);
   }
 
+  public void deleteUser(User user) {
+    this.users.remove(user);
+  }
+
+  public void changeHost(User user) {
+    this.host = user;
+  }
+
   public void setSettings(Setting settings) {
     this.settings = settings;
   }
 
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public void update() {
+    setUpdatedAt(LocalDateTime.now());
   }
 }
