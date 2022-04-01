@@ -17,11 +17,11 @@ public class GameRoom {
   private LocalDateTime updatedAt;
 
   @Builder
-  public GameRoom(User host, Setting settings) {
+  public GameRoom(String roomId, User host, Setting settings) {
     if (host == null || settings == null) {
       throw new IllegalStateException();
     }
-    this.roomId = UUID.randomUUID().toString(); // TODO : roomId 생성 자체 알고리즘으로 변경
+    this.roomId = roomId;//UUID.randomUUID().toString(); // TODO : roomId 생성 자체 알고리즘으로 변경
     this.host = host;
     this.users.add(host);
     this.settings = settings;

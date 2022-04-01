@@ -1,5 +1,10 @@
 package com.api.liargame.domain;
 
-public class Setting {
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+public class Setting {
+    int maxUser;
 }
