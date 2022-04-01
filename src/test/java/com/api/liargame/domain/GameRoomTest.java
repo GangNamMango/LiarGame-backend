@@ -3,6 +3,8 @@ package com.api.liargame.domain;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.api.liargame.domain.User.Role;
+import com.api.liargame.exception.DuplicateUserNicknameException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,10 +16,12 @@ class GameRoomTest {
     User user = User.builder()
         .nickname("user1")
         .character("c1")
+        .role(Role.HOST)
         .build();
     User user2 = User.builder()
         .nickname("user2")
         .character("c2")
+        .role(Role.GUEST)
         .build();
     Setting setting = new Setting();
 
@@ -26,7 +30,6 @@ class GameRoomTest {
         .host(user)
         .settings(setting)
         .build();
-    gameRoom.addUser(user2);
     gameRoom.addUser(user2);
 
     //then
@@ -41,10 +44,12 @@ class GameRoomTest {
     User user = User.builder()
         .nickname("user1")
         .character("c1")
+        .role(Role.HOST)
         .build();
     User user2 = User.builder()
         .nickname("user2")
         .character("c2")
+        .role(Role.GUEST)
         .build();
     Setting setting = new Setting();
     GameRoom gameRoom = GameRoom.builder()
@@ -66,10 +71,12 @@ class GameRoomTest {
     User originalHost = User.builder()
         .nickname("user1")
         .character("c1")
+        .role(Role.HOST)
         .build();
     User changeHost = User.builder()
         .nickname("user2")
         .character("c2")
+        .role(Role.GUEST)
         .build();
     Setting setting = new Setting();
     GameRoom gameRoom = GameRoom.builder()
@@ -80,6 +87,7 @@ class GameRoomTest {
     gameRoom.changeHost(changeHost);
 
     assertThat(gameRoom.getHost()).isSameAs(changeHost);
+    assertThat(changeHost.getRole()).isEqualTo(Role.HOST);
   }
 
   @Test
@@ -89,5 +97,29 @@ class GameRoomTest {
       GameRoom gameRoom = GameRoom.builder()
           .build();
     });
+  }
+
+  @Test
+  @DisplayName("중복된 닉네임의 유저는 추가할 수 없다.")
+  void duplicate_user_nickname() {
+    User user = User.builder()
+        .nickname("user1")
+        .character("c1")
+        .role(Role.HOST)
+        .build();
+
+    User user2 = User.builder()
+        .nickname("user1")
+        .character("c2")
+        .role(Role.GUEST)
+        .build();
+
+    Setting setting = new Setting();
+    GameRoom gameRoom = GameRoom.builder()
+        .host(user)
+        .settings(setting)
+        .build();
+
+    assertThrows(DuplicateUserNicknameException.class, () -> gameRoom.addUser(user2));
   }
 }

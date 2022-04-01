@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/game")
@@ -37,7 +35,7 @@ public class GameRoomController {
   @PostMapping("/room")
   @ResponseBody
   public GameRoom createRoom(@RequestBody UserRequestDto userRequestDto) {
-    System.out.println(userRequestDto.toString());    
+    System.out.println(userRequestDto.toString());
     return gameRoomService.createdRoom(userRequestDto);
 
   }

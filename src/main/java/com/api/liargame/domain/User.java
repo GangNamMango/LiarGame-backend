@@ -25,11 +25,14 @@ public class User {
   private LocalDateTime updatedAt;
 
   @Builder
-  public User(String nickname, Role role, GameRole gameRole, String character) {
+  public User(String nickname, Role role, String character) {
+    if (role == null) {
+      throw new IllegalStateException("Not exist role");
+    }
     this.id = UUID.randomUUID().toString();
     this.nickname = nickname;
     this.role = role;
-    this.gameRole = gameRole;
+    this.gameRole = GameRole.MEMBER;
     this.character = character;
     this.createdAt = LocalDateTime.now();
     this.updatedAt = LocalDateTime.now();
