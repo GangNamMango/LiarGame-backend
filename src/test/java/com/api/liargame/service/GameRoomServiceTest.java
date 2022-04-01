@@ -3,6 +3,7 @@ package com.api.liargame.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.api.liargame.constants.SettingConstant;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.domain.GameRoom;
@@ -43,6 +44,19 @@ class GameRoomServiceTest {
         .build();
   }
 
+
+  @Test
+  @DisplayName("게임 방을 생성할 수 있어야 한다.")
+  void create(){
+    UserRequestDto userRequestDto = new UserRequestDto("user1", "ch1");
+
+    GameRoom room = gameRoomService.createRoom(userRequestDto);
+
+    assertThat(room.getRoomId().length()).isEqualTo(5);
+    assertThat(room.getHost().getNickname()).isEqualTo("user1");
+    assertThat(room.getSettings().getTimeLimit()).isEqualTo(SettingConstant.DEFAULT_TIME_LIMIT);
+    assertThat(room.getUsers().size()).isEqualTo(1);
+  }
 
 
   @Test

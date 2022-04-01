@@ -6,9 +6,12 @@ import com.api.liargame.domain.GameRoom;
 
 public interface GameRoomService {
 
-  GameRoom createdRoom(UserRequestDto userRequestDto);
+  GameRoom createRoom(UserRequestDto userRequestDto);
+
+
+  GameRoom enter(EnterRequestDto enterRequestDto);
 
   String createGameRoomId();
 
-  GameRoom enter(EnterRequestDto enterRequestDto);
+  String randomRoomId();
 }

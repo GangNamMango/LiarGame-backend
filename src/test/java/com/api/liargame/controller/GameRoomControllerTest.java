@@ -40,6 +40,25 @@ class GameRoomControllerTest {
   private final static ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
+  @DisplayName("방 생성 api 테스트")
+  void create() throws Exception {
+    UserRequestDto userRequestDto = new UserRequestDto("user1", "ch1");
+
+    String body = objectMapper.writeValueAsString(userRequestDto);
+
+    RequestEntity request = RequestEntity.post("/game/room").accept(MediaType.APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(body);
+
+    Map<String, Object> response = testRestTemplate.exchange(request, Map.class).getBody();
+    Map<String, Object> data = (Map)response.get("data");
+    Map<String, Object> host = (Map) data.get("host");
+
+    assertThat(response.get("status")).isEqualTo(ResponseStatus.SUCCESS);
+    assertThat(host.get("nickname")).isEqualTo("user1");
+  }
+
+  @Test
   @DisplayName("방 입장 api 테스트")
   void enter() throws Exception {
     GameRoom gameRoom = createGameRoom();

@@ -53,9 +53,16 @@ public class GameRoomController {
   }
 
   @PostMapping("/room")
-  @ResponseBody
-  public GameRoom createRoom(@RequestBody UserRequestDto userRequestDto) {
-    System.out.println(userRequestDto.toString());
-    return gameRoomService.createdRoom(userRequestDto);
+  public ResponseDto<GameRoomDto> createRoom(@RequestBody UserRequestDto userRequestDto) {
+    GameRoom gameRoom = gameRoomService.createRoom(userRequestDto);
+    GameRoomDto gameRoomResponse = new GameRoomDto(gameRoom);
+
+    ResponseDto<GameRoomDto> httpResponse = ResponseDto.<GameRoomDto>builder()
+        .status(ResponseStatus.SUCCESS)
+        .message("게임 방이 생성되었습니다.")
+        .data(gameRoomResponse)
+        .build();
+
+    return httpResponse;
   }
 }
