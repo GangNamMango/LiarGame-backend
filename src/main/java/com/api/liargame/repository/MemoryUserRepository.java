@@ -1,9 +1,14 @@
 package com.api.liargame.repository;
 
 import com.api.liargame.domain.User;
+
+import org.springframework.stereotype.Repository;
+
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
+@Repository
 public class MemoryUserRepository implements UserRepository {
 
   List<User> users = new LinkedList<>();

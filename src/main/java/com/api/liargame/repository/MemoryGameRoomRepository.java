@@ -1,10 +1,9 @@
 package com.api.liargame.repository;
 
 import com.api.liargame.domain.GameRoom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -36,5 +35,15 @@ public class MemoryGameRoomRepository implements GameRoomRepository{
   @Override
   public List<GameRoom> findAll() {
     return new ArrayList<>(gameRoomMemory.values());
+  }
+
+  @Override
+  public String createRoomId(){
+    int length = 5;
+    String str = "qwertyuiopasdfghjklzxcvbnm123456789";
+    String roomId = "";
+    Random random = new Random();
+    for (int i =0; i < 5; i++) roomId += str.charAt( random.nextInt(str.length()));
+    return roomId;
   }
 }
