@@ -11,7 +11,7 @@ import java.util.Random;
 @Repository
 public class MemoryUserRepository implements UserRepository {
 
-  List<User> users = new LinkedList<>();
+  private final static List<User> users = new LinkedList<>();
 
   @Override
   public String save(User user) {

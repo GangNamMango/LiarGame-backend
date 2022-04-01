@@ -3,6 +3,7 @@ package com.api.liargame.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.api.liargame.domain.User;
+import com.api.liargame.domain.User.Role;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,11 +18,13 @@ class MemoryUserRepositoryTest {
     User user1 = User.builder()
         .nickname("user1")
         .character("c1")
+        .role(Role.HOST)
         .build();
 
     User user2 = User.builder()
         .nickname("user2")
         .character("c2")
+        .role(Role.GUEST)
         .build();
 
     String savedId = userRepository.save(user1);
@@ -40,6 +43,7 @@ class MemoryUserRepositoryTest {
     User user1 = User.builder()
         .nickname("user1")
         .character("c1")
+        .role(Role.HOST)
         .build();
 
     userRepository.save(user1);

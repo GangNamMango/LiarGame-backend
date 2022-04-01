@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class MemoryGameRoomRepository implements GameRoomRepository{
 
-  private final Map<String, GameRoom> gameRoomMemory = new HashMap<>();
+  private final static Map<String, GameRoom> gameRoomMemory = new HashMap<>();
 
   @Override
   public String save(GameRoom gameRoom) {

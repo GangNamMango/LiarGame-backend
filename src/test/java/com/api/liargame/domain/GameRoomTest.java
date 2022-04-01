@@ -33,7 +33,6 @@ class GameRoomTest {
     gameRoom.addUser(user2);
 
     //then
-    assertThat(gameRoom.getRoomId()).isNotEmpty();
     assertThat(gameRoom.getUsers().size()).isEqualTo(2);
     assertThat(gameRoom.getHost()).isSameAs(user);
   }
