@@ -52,10 +52,8 @@ class GameRoomControllerTest {
 
     Map<String, Object> response = testRestTemplate.exchange(request, Map.class).getBody();
     Map<String, Object> data = (Map)response.get("data");
-    Map<String, Object> host = (Map) data.get("host");
 
     assertThat(response.get("status")).isEqualTo(ResponseStatus.SUCCESS);
-    assertThat(host.get("nickname")).isEqualTo("user1");
   }
 
   @Test

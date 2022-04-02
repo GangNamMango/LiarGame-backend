@@ -47,8 +47,7 @@ public class GameRoomController {
         .message(enterUserNickname + "님이 입장하셨습니다.")
         .data(gameRoomResponse.getUsers())
         .build();
-
-    webSocket.convertAndSend("/sub/game/" + gameRoom.getRoomId(), socketResponse);
+    webSocket.convertAndSend("/sub/game/enter/" + gameRoom.getRoomId(), socketResponse);
     return httpResponse;
   }
 

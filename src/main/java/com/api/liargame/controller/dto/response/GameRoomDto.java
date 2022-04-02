@@ -10,9 +10,9 @@ import lombok.Getter;
 
 @Getter
 public class GameRoomDto {
+
   private final String roomId;
   private final List<UserResponseDto> users;
-  private final UserResponseDto host;
   private final Setting settings;
 
   public GameRoomDto(GameRoom gameRoom) {
@@ -20,7 +20,6 @@ public class GameRoomDto {
 
     this.roomId = gameRoom.getRoomId();
     this.users = users.stream().map(UserResponseDto::new).collect(Collectors.toList());
-    this.host = new UserResponseDto(gameRoom.getHost());
     this.settings = gameRoom.getSettings();
   }
 }
