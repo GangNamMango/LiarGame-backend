@@ -8,5 +8,4 @@ public interface GameRoomRepository {
   void delete(String roomId);
   GameRoom findById(String roomId);
   List<GameRoom> findAll();
-  String createRoomId();
 }

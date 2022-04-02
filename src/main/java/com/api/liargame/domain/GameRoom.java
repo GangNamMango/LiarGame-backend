@@ -1,5 +1,7 @@
 package com.api.liargame.domain;
 
+import com.api.liargame.domain.User.Role;
+import com.api.liargame.exception.DuplicateUserNicknameException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,6 +11,7 @@ import lombok.Getter;
 
 @Getter
 public class GameRoom {
+
   private final String roomId;
   private final Set<User> users = new HashSet<>();
   private User host;
@@ -30,6 +33,16 @@ public class GameRoom {
   }
 
   public void addUser(User user) {
+    String nickname = user.getNickname();
+
+    boolean isDuplicated = users
+        .stream()
+        .anyMatch(u -> u.getNickname().equals(nickname));
+
+    if (isDuplicated) {
+      throw new DuplicateUserNicknameException();
+    }
+
     this.users.add(user);
   }
 
@@ -38,6 +51,8 @@ public class GameRoom {
   }
 
   public void changeHost(User user) {
+    user.setRole(Role.HOST);
+
     this.host = user;
   }
 
