@@ -8,4 +8,5 @@ public interface UserRepository {
   void delete(String id);
   User findById(String id);
   List<User> findAll();
+  void clear();
 }

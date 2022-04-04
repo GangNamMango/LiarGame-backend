@@ -13,7 +13,7 @@ import com.api.liargame.domain.User.Role;
 import com.api.liargame.exception.DuplicateUserNicknameException;
 import com.api.liargame.exception.NotFoundGameRoomException;
 import com.api.liargame.repository.GameRoomRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.api.liargame.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +27,18 @@ class GameRoomServiceTest {
   GameRoomService gameRoomService;
   @Autowired
   GameRoomRepository gameRoomRepository;
+  @Autowired
+  UserRepository userRepository;
 
-  GameRoom gameRoom;
-
-  @BeforeEach
-  void beforeEach() {
+  GameRoom createRoom() {
     User user = User.builder()
         .nickname("user1")
         .character("ch1")
         .role(Role.HOST)
         .build();
     Setting setting = new Setting();
-    gameRoom = GameRoom.builder()
+    return GameRoom.builder()
+        .roomId("roomID")
         .host(user)
         .settings(setting)
         .build();
@@ -62,17 +62,17 @@ class GameRoomServiceTest {
   @Test
   @DisplayName("게임 방에 입장할 수 있어야 한다.")
   void enter() {
+    GameRoom gameRoom = createRoom();
     //게임 방 저장
     String roomId = gameRoomRepository.save(gameRoom);
-
     //유저 요청 생성
     UserRequestDto userRequestDto = new UserRequestDto("user2", "ch2");
     EnterRequestDto enterRequestDto = new EnterRequestDto(roomId, userRequestDto);
 
     //방 입장
     User enteredUser = gameRoomService.enter(enterRequestDto);
-    GameRoom gameRoom = gameRoomRepository.findById(roomId);
-    User foundUser = gameRoom.getUsers()
+    GameRoom foundGameRoom = gameRoomRepository.findById(roomId);
+    User foundUser = foundGameRoom.getUsers()
         .stream().filter(u -> u.getRole().equals(Role.GUEST))
         .findAny()
         .get();
@@ -95,6 +95,7 @@ class GameRoomServiceTest {
   @Test
   @DisplayName("중복된 닉네임은 방에 입장할 수 없어야 한다.")
   void fail_when_duplicate_nickname() {
+    GameRoom gameRoom = createRoom();
     //게임 방 저장
     String roomId = gameRoomRepository.save(gameRoom);
 
@@ -105,5 +106,70 @@ class GameRoomServiceTest {
     // 결과
     assertThrows(DuplicateUserNicknameException.class,
         () -> gameRoomService.enter(enterRequestDto));
+  }
+
+  @Test
+  @DisplayName("게임 방에서 나갈 수 있어야 한다.")
+  void leave() {
+    GameRoom gameRoom = createRoom();
+    User user = new User("test", Role.GUEST, "Ch1");
+
+    String roomId = gameRoomRepository.save(gameRoom);
+    userRepository.save(user);
+
+    gameRoom.addUser(user);
+    User leavedUser = gameRoomService.leave(roomId, user.getId());
+
+    GameRoom updatedGameRoom = gameRoomRepository.findById(roomId);
+    User foundUser = userRepository.findById(user.getId());
+
+    assertThat(leavedUser.getId()).isEqualTo(user.getId());
+    assertThat(updatedGameRoom.getUsers().size()).isEqualTo(1);
+    assertThat(foundUser).isNull();
+  }
+
+  @Test
+  @DisplayName("방장이 나갔을 경우 방장이 변경되어야 한다.")
+  void leave_host() {
+    User host = new User("host", Role.HOST, "ch0");
+    User user = new User("test", Role.GUEST, "ch1");
+    User user2 = new User("test2", Role.GUEST, "ch2");
+    GameRoom gameRoom = new GameRoom("roomId", host, new Setting());
+
+    userRepository.save(host);
+    userRepository.save(user);
+    userRepository.save(user2);
+    gameRoomRepository.save(gameRoom);
+
+    gameRoom.addUser(user);
+    gameRoom.addUser(user2);
+
+    String originalHostId = gameRoom.getHost().getId();
+    gameRoomService.leave(gameRoom.getRoomId(), originalHostId);
+
+    GameRoom foundGameRoom = gameRoomRepository.findById(gameRoom.getRoomId());
+    User leavedUser = userRepository.findById(originalHostId);
+
+    assertThat(foundGameRoom.getHost().getId()).isNotEqualTo(originalHostId);
+    assertThat(foundGameRoom.getUsers().size()).isEqualTo(2);
+    assertThat(foundGameRoom.getHost().getRole()).isEqualTo(Role.HOST);
+    assertThat(leavedUser).isNull();
+  }
+
+  @Test
+  @DisplayName("대기실 인원이 1명일 경우 방은 삭제되어야 한다.")
+  void leave_host_and_delete_room() {
+    User host = new User("host", Role.HOST, "ch0");
+    GameRoom gameRoom = new GameRoom("roomId", host, new Setting());
+    userRepository.save(host);
+    gameRoomRepository.save(gameRoom);
+
+    User leavedUser = gameRoomService.leave(gameRoom.getRoomId(), host.getId());
+    GameRoom foundGameRoom = gameRoomRepository.findById(gameRoom.getRoomId());
+    User foundUser = userRepository.findById(host.getId());
+
+    assertThat(leavedUser.getId()).isEqualTo(host.getId());
+    assertThat(foundGameRoom).isNull();
+    assertThat(foundUser).isNull();
   }
 }

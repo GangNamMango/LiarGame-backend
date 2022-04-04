@@ -1,6 +1,7 @@
 package com.api.liargame.controller;
 
 import com.api.liargame.controller.dto.request.EnterRequestDto;
+import com.api.liargame.controller.dto.request.LeaveRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.controller.dto.response.EnterResponseDto;
 import com.api.liargame.controller.dto.response.GameRoomDto;
@@ -13,6 +14,7 @@ import com.api.liargame.service.GameRoomService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,5 +69,25 @@ public class GameRoomController {
         .build();
 
     return httpResponse;
+  }
+
+  @MessageMapping("/leave")
+  public void leave(@Payload LeaveRequestDto leaveRequestDto) {
+    String roomId = leaveRequestDto.getRoomId();
+    String userId = leaveRequestDto.getUserId();
+    User leavedUser = gameRoomService.leave(roomId, userId);
+    GameRoom gameRoom = gameRoomService.find(roomId);
+
+    if (gameRoom == null) return;
+
+    GameRoomDto gameRoomResponse = new GameRoomDto(gameRoom);
+
+    ResponseDto<?> socketResponse = ResponseDto.<GameRoomDto>builder()
+        .status(ResponseStatus.SUCCESS)
+        .message(leavedUser.getNickname() + "님이 대기실을 나갔습니다.")
+        .data(gameRoomResponse)
+        .build();
+
+    webSocket.convertAndSend("/sub/game/leave/" + roomId, socketResponse);
   }
 }

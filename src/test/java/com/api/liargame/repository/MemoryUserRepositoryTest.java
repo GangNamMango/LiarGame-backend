@@ -5,12 +5,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class MemoryUserRepositoryTest {
 
   UserRepository userRepository = new MemoryUserRepository();
+
+
+
+  @BeforeEach
+  void beforeEach() {
+    userRepository.clear();
+  }
 
   @Test
   @DisplayName("유저를 저장할 수 있어야 한다.")
