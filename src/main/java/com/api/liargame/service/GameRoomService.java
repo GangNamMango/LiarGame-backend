@@ -13,7 +13,10 @@ public interface GameRoomService {
 
   GameRoom find(String roomId);
 
+  User leave(String roomId, String userId);
+
   String createGameRoomId();
 
   String randomRoomId();
+
 }

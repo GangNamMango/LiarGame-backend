@@ -5,7 +5,6 @@ import com.api.liargame.exception.DuplicateUserNicknameException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,10 +20,10 @@ public class GameRoom {
 
   @Builder
   public GameRoom(String roomId, User host, Setting settings) {
-    if (host == null || settings == null) {
+    if (host == null || settings == null | host.getRole() != Role.HOST) {
       throw new IllegalStateException();
     }
-    this.roomId = roomId;//UUID.randomUUID().toString(); // TODO : roomId 생성 자체 알고리즘으로 변경
+    this.roomId = roomId;
     this.host = host;
     this.users.add(host);
     this.settings = settings;
