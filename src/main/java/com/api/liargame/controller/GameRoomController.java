@@ -2,11 +2,13 @@ package com.api.liargame.controller;
 
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
+import com.api.liargame.controller.dto.response.EnterResponseDto;
 import com.api.liargame.controller.dto.response.GameRoomDto;
 import com.api.liargame.controller.dto.response.ResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto.ResponseStatus;
 import com.api.liargame.controller.dto.response.UserResponseDto;
 import com.api.liargame.domain.GameRoom;
+import com.api.liargame.domain.User;
 import com.api.liargame.service.GameRoomService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,23 +32,25 @@ public class GameRoomController {
   private final GameRoomService gameRoomService;
 
   @PostMapping("/enter")
-  public ResponseDto<GameRoomDto> enter(@RequestBody EnterRequestDto enterRequestDto) {
-    GameRoom gameRoom = gameRoomService.enter(enterRequestDto);
-    GameRoomDto gameRoomResponse = new GameRoomDto(gameRoom);
+  public ResponseDto<EnterResponseDto> enter(@RequestBody EnterRequestDto enterRequestDto) {
+    User enteredUser = gameRoomService.enter(enterRequestDto);
+    GameRoom gameRoom = gameRoomService.find(enterRequestDto.getRoomId());
+    GameRoomDto gameRoomDto = new GameRoomDto(gameRoom);
 
-    String enterUserNickname = enterRequestDto.getUser().getNickname();
+    EnterResponseDto enterResponseDto = new EnterResponseDto(enteredUser.getId(), gameRoomDto);
 
-    ResponseDto<GameRoomDto> httpResponse = ResponseDto.<GameRoomDto>builder()
+    ResponseDto<EnterResponseDto> httpResponse = ResponseDto.<EnterResponseDto>builder()
         .status(ResponseStatus.SUCCESS)
         .message("입장에 성공했습니다.")
-        .data(gameRoomResponse)
+        .data(enterResponseDto)
         .build();
 
     ResponseDto<?> socketResponse = ResponseDto.<List<UserResponseDto>>builder()
         .status(ResponseStatus.SUCCESS)
-        .message(enterUserNickname + "님이 입장하셨습니다.")
-        .data(gameRoomResponse.getUsers())
+        .message(enteredUser.getNickname() + "님이 입장하셨습니다.")
+        .data(gameRoomDto.getUsers())
         .build();
+
     webSocket.convertAndSend("/sub/game/enter/" + gameRoom.getRoomId(), socketResponse);
     return httpResponse;
   }
