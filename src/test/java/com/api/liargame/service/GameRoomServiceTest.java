@@ -70,11 +70,16 @@ class GameRoomServiceTest {
     EnterRequestDto enterRequestDto = new EnterRequestDto(roomId, userRequestDto);
 
     //방 입장
-    GameRoom gameRoomResult = gameRoomService.enter(enterRequestDto);
+    User enteredUser = gameRoomService.enter(enterRequestDto);
+    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    User foundUser = gameRoom.getUsers()
+        .stream().filter(u -> u.getRole().equals(Role.GUEST))
+        .findAny()
+        .get();
 
     // 결과
-    assertThat(gameRoomResult).isSameAs(gameRoom);
-    assertThat(gameRoomResult.getUsers().size()).isEqualTo(2);
+    assertThat(gameRoom.getUsers().size()).isEqualTo(2);
+    assertThat(foundUser.getId()).isEqualTo(enteredUser.getId());
   }
 
   @Test

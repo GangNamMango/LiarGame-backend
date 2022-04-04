@@ -36,7 +36,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   @Override
-  public GameRoom enter(EnterRequestDto enterRequestDto) {
+  public User enter(EnterRequestDto enterRequestDto) {
     String roomId = enterRequestDto.getRoomId();
     GameRoom foundGameRoom = gameRoomRepository.findById(roomId);
     if (foundGameRoom == null) {
@@ -48,7 +48,12 @@ public class GameRoomServiceImpl implements GameRoomService {
     foundGameRoom.addUser(user);
     foundGameRoom.update();
 
-    return foundGameRoom;
+    return user;
+  }
+
+  @Override
+  public GameRoom find(String roomId) {
+    return gameRoomRepository.findById(roomId);
   }
 
   @Override
