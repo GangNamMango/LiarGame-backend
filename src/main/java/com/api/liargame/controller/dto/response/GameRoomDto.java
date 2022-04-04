@@ -12,6 +12,7 @@ import lombok.Getter;
 public class GameRoomDto {
 
   private final String roomId;
+  private final String hostId;
   private final List<UserResponseDto> users;
   private final Setting settings;
 
@@ -19,6 +20,7 @@ public class GameRoomDto {
     Set<User> users = gameRoom.getUsers();
 
     this.roomId = gameRoom.getRoomId();
+    this.hostId = gameRoom.getHost().getId();
     this.users = users.stream().map(UserResponseDto::new).collect(Collectors.toList());
     this.settings = gameRoom.getSettings();
   }
