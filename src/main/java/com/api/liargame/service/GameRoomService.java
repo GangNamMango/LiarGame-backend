@@ -14,4 +14,6 @@ public interface GameRoomService {
   String createGameRoomId();
 
   String randomRoomId();
+
+  GameRoom findRoom(String roomId);
 }

@@ -62,7 +62,6 @@ public class GameRoomServiceImpl implements GameRoomService {
     }
   }
 
-
   @Override
   public String randomRoomId() {
     int length = 5;
@@ -74,5 +73,10 @@ public class GameRoomServiceImpl implements GameRoomService {
     }
 
     return roomId;
+  }
+
+  @Override
+  public GameRoom findRoom(String roomId) {
+    return gameRoomRepository.findById(roomId);
   }
 }
