@@ -8,6 +8,8 @@ import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
 import com.api.liargame.exception.NotFoundGameRoomException;
 import com.api.liargame.repository.GameRoomRepository;
+import com.api.liargame.repository.UserRepository;
+import java.util.Optional;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class GameRoomServiceImpl implements GameRoomService {
 
   private final GameRoomRepository gameRoomRepository;
+  private final UserRepository userRepository;
 
   @Override
   public GameRoom createRoom(UserRequestDto userRequestDto) {
@@ -36,7 +39,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   @Override
-  public GameRoom enter(EnterRequestDto enterRequestDto) {
+  public User enter(EnterRequestDto enterRequestDto) {
     String roomId = enterRequestDto.getRoomId();
     GameRoom foundGameRoom = gameRoomRepository.findById(roomId);
     if (foundGameRoom == null) {
@@ -44,11 +47,44 @@ public class GameRoomServiceImpl implements GameRoomService {
     }
 
     User user = enterRequestDto.getUser().toEntity();
+    userRepository.save(user);
 
     foundGameRoom.addUser(user);
     foundGameRoom.update();
 
-    return foundGameRoom;
+    return user;
+  }
+
+  @Override
+  public GameRoom find(String roomId) {
+    return gameRoomRepository.findById(roomId);
+  }
+
+  @Override
+  public User leave(String roomId, String userId) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    User user = userRepository.findById(userId);
+
+    if (user.getRole() == Role.HOST) {
+      Optional<User> nextHost = gameRoom
+          .getUsers()
+          .stream()
+          .filter(u -> !u.getId().equals(userId))
+          .findAny();
+
+      if (nextHost.isPresent())
+        gameRoom.changeHost(nextHost.get());
+      else {
+        gameRoomRepository.delete(gameRoom.getRoomId());
+      }
+    }
+
+    gameRoom.deleteUser(user);
+    gameRoom.update();
+
+    userRepository.delete(user.getId());
+
+    return user;
   }
 
   @Override
@@ -73,10 +109,5 @@ public class GameRoomServiceImpl implements GameRoomService {
     }
 
     return roomId;
-  }
-
-  @Override
-  public GameRoom findRoom(String roomId) {
-    return gameRoomRepository.findById(roomId);
   }
 }

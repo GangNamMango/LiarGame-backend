@@ -2,8 +2,11 @@ package com.api.liargame.controller;
 
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.SettingRequestDto;
+import com.api.liargame.controller.dto.request.LeaveRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
-import com.api.liargame.controller.dto.response.GameRoomDto;
+import com.api.liargame.controller.dto.response.CreateResponseDto;
+import com.api.liargame.controller.dto.response.EnterResponseDto;
+import com.api.liargame.controller.dto.response.GameRoomResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto.ResponseStatus;
 import com.api.liargame.controller.dto.response.UserResponseDto;
@@ -17,6 +20,7 @@ import com.api.liargame.service.SettingService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,36 +42,41 @@ public class GameRoomController {
   private final GameRoomService gameRoomService;
   private final SettingService settingService;
   @PostMapping("/enter")
-  public ResponseDto<GameRoomDto> enter(@RequestBody EnterRequestDto enterRequestDto) {
-    GameRoom gameRoom = gameRoomService.enter(enterRequestDto);
-    GameRoomDto gameRoomResponse = new GameRoomDto(gameRoom);
+  public ResponseDto<EnterResponseDto> enter(@RequestBody EnterRequestDto enterRequestDto) {
+    User enteredUser = gameRoomService.enter(enterRequestDto);
+    GameRoom gameRoom = gameRoomService.find(enterRequestDto.getRoomId());
+    GameRoomResponseDto gameRoomDto = new GameRoomResponseDto(gameRoom);
 
-    String enterUserNickname = enterRequestDto.getUser().getNickname();
+    EnterResponseDto enterResponseDto = new EnterResponseDto(enteredUser.getId(), gameRoomDto);
 
-    ResponseDto<GameRoomDto> httpResponse = ResponseDto.<GameRoomDto>builder()
+    ResponseDto<EnterResponseDto> httpResponse = ResponseDto.<EnterResponseDto>builder()
         .status(ResponseStatus.SUCCESS)
         .message("입장에 성공했습니다.")
-        .data(gameRoomResponse)
+        .data(enterResponseDto)
         .build();
 
     ResponseDto<?> socketResponse = ResponseDto.<List<UserResponseDto>>builder()
         .status(ResponseStatus.SUCCESS)
-        .message(enterUserNickname + "님이 입장하셨습니다.")
-        .data(gameRoomResponse.getUsers())
+        .message(enteredUser.getNickname() + "님이 입장하셨습니다.")
+        .data(gameRoomDto.getUsers())
         .build();
+
     webSocket.convertAndSend("/sub/game/enter/" + gameRoom.getRoomId(), socketResponse);
     return httpResponse;
   }
 
   @PostMapping("/room")
-  public ResponseDto<GameRoomDto> createRoom(@RequestBody UserRequestDto userRequestDto) {
+  public ResponseDto<CreateResponseDto> createRoom(@RequestBody UserRequestDto userRequestDto) {
     GameRoom gameRoom = gameRoomService.createRoom(userRequestDto);
-    GameRoomDto gameRoomResponse = new GameRoomDto(gameRoom);
+    GameRoomResponseDto gameRoomResponse = new GameRoomResponseDto(gameRoom);
 
-    ResponseDto<GameRoomDto> httpResponse = ResponseDto.<GameRoomDto>builder()
+    CreateResponseDto createResponseDto = new CreateResponseDto(gameRoom.getHost().getId(),
+        gameRoomResponse);
+
+    ResponseDto<CreateResponseDto> httpResponse = ResponseDto.<CreateResponseDto>builder()
         .status(ResponseStatus.SUCCESS)
         .message("게임 방이 생성되었습니다.")
-        .data(gameRoomResponse)
+        .data(createResponseDto)
         .build();
 
     return httpResponse;
@@ -87,5 +96,25 @@ public class GameRoomController {
 
     webSocket.convertAndSend("/sub/game/setting/" + gameRoom.getRoomId(), updatedSetting);
     return httpResponse;
+  }
+  
+  @MessageMapping("/leave")
+  public void leave(@Payload LeaveRequestDto leaveRequestDto) {
+    String roomId = leaveRequestDto.getRoomId();
+    String userId = leaveRequestDto.getUserId();
+    User leavedUser = gameRoomService.leave(roomId, userId);
+    GameRoom gameRoom = gameRoomService.find(roomId);
+
+    if (gameRoom == null) return;
+
+    GameRoomResponseDto gameRoomResponse = new GameRoomResponseDto(gameRoom);
+
+    ResponseDto<?> socketResponse = ResponseDto.<GameRoomResponseDto>builder()
+        .status(ResponseStatus.SUCCESS)
+        .message(leavedUser.getNickname() + "님이 대기실을 나갔습니다.")
+        .data(gameRoomResponse)
+        .build();
+
+    webSocket.convertAndSend("/sub/game/leave/" + roomId, socketResponse);
   }
 }
