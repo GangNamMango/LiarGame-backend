@@ -6,5 +6,5 @@ import com.api.liargame.domain.User;
 
 public interface SettingService {
     Setting updateSetting(GameRoom gameRoom, Setting setting); 
-    boolean checkPermission(GameRoom gameRoom, String userId);
+    void checkPermission(GameRoom gameRoom, String userId);
 }
