@@ -3,8 +3,9 @@ package com.api.liargame.controller;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.LeaveRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
+import com.api.liargame.controller.dto.response.CreateResponseDto;
 import com.api.liargame.controller.dto.response.EnterResponseDto;
-import com.api.liargame.controller.dto.response.GameRoomDto;
+import com.api.liargame.controller.dto.response.GameRoomResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto.ResponseStatus;
 import com.api.liargame.controller.dto.response.UserResponseDto;
@@ -37,7 +38,7 @@ public class GameRoomController {
   public ResponseDto<EnterResponseDto> enter(@RequestBody EnterRequestDto enterRequestDto) {
     User enteredUser = gameRoomService.enter(enterRequestDto);
     GameRoom gameRoom = gameRoomService.find(enterRequestDto.getRoomId());
-    GameRoomDto gameRoomDto = new GameRoomDto(gameRoom);
+    GameRoomResponseDto gameRoomDto = new GameRoomResponseDto(gameRoom);
 
     EnterResponseDto enterResponseDto = new EnterResponseDto(enteredUser.getId(), gameRoomDto);
 
@@ -58,14 +59,17 @@ public class GameRoomController {
   }
 
   @PostMapping("/room")
-  public ResponseDto<GameRoomDto> createRoom(@RequestBody UserRequestDto userRequestDto) {
+  public ResponseDto<CreateResponseDto> createRoom(@RequestBody UserRequestDto userRequestDto) {
     GameRoom gameRoom = gameRoomService.createRoom(userRequestDto);
-    GameRoomDto gameRoomResponse = new GameRoomDto(gameRoom);
+    GameRoomResponseDto gameRoomResponse = new GameRoomResponseDto(gameRoom);
 
-    ResponseDto<GameRoomDto> httpResponse = ResponseDto.<GameRoomDto>builder()
+    CreateResponseDto createResponseDto = new CreateResponseDto(gameRoom.getHost().getId(),
+        gameRoomResponse);
+
+    ResponseDto<CreateResponseDto> httpResponse = ResponseDto.<CreateResponseDto>builder()
         .status(ResponseStatus.SUCCESS)
         .message("게임 방이 생성되었습니다.")
-        .data(gameRoomResponse)
+        .data(createResponseDto)
         .build();
 
     return httpResponse;
@@ -80,9 +84,9 @@ public class GameRoomController {
 
     if (gameRoom == null) return;
 
-    GameRoomDto gameRoomResponse = new GameRoomDto(gameRoom);
+    GameRoomResponseDto gameRoomResponse = new GameRoomResponseDto(gameRoom);
 
-    ResponseDto<?> socketResponse = ResponseDto.<GameRoomDto>builder()
+    ResponseDto<?> socketResponse = ResponseDto.<GameRoomResponseDto>builder()
         .status(ResponseStatus.SUCCESS)
         .message(leavedUser.getNickname() + "님이 대기실을 나갔습니다.")
         .data(gameRoomResponse)

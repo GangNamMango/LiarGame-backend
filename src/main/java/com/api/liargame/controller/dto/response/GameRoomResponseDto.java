@@ -9,18 +9,16 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
-public class GameRoomDto {
+public class GameRoomResponseDto {
 
   private final String roomId;
-  private final String hostId;
   private final List<UserResponseDto> users;
   private final Setting settings;
 
-  public GameRoomDto(GameRoom gameRoom) {
+  public GameRoomResponseDto(GameRoom gameRoom) {
     Set<User> users = gameRoom.getUsers();
 
     this.roomId = gameRoom.getRoomId();
-    this.hostId = gameRoom.getHost().getId();
     this.users = users.stream().map(UserResponseDto::new).collect(Collectors.toList());
     this.settings = gameRoom.getSettings();
   }
