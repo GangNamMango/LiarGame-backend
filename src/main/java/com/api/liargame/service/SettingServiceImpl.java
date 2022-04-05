@@ -19,9 +19,9 @@ public class SettingServiceImpl implements SettingService{
     // private final GameRoomRepository gameRoomRepository;
 
     @Override
-    public boolean checkPermission(GameRoom gameRoom, String userId){
+    public void checkPermission(GameRoom gameRoom, String userId){
         if(gameRoom.getHost().getId().equals(userId)){
-            return true;
+            return ;
         }
         throw new SettingPermissionException("방의 호스트가 아닙니다.");
     }
@@ -29,9 +29,8 @@ public class SettingServiceImpl implements SettingService{
     
     @Override
     public Setting updateSetting(GameRoom gameRoom, Setting setting) {
-        //if(gameRoom == null)  error;
-        //boolean isHost = gameRoom.getHost().equals(user);
         gameRoom.setSettings(setting);
+        gameRoom.update();
         return gameRoom.getSettings();
     }
 }
