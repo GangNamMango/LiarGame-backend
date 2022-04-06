@@ -22,7 +22,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -102,19 +101,27 @@ public class GameRoomController {
     webSocket.convertAndSend("/sub/game/leave/" + roomId, socketResponse);
   }
 
-  @PostMapping("/room/setting/{roomId}")
-  public ResponseDto<Setting> updatSetting(@PathVariable String roomId,  @RequestBody SettingRequestDto settingDto) {
+  @MessageMapping("/setting")
+  public void updateSetting(@Payload SettingRequestDto settingRequestDto) {
+    String roomId = settingRequestDto.getRoomId();
     GameRoom gameRoom = gameRoomService.find(roomId);
-    settingService.checkPermission(gameRoom, settingDto.getId());
-    Setting newSetting = settingDto.getSetting();
-    Setting updatedSetting = settingService.updateSetting(gameRoom, newSetting);
-    ResponseDto<Setting> httpResponse = ResponseDto.<Setting>builder()
-      .status(ResponseStatus.SUCCESS)
-      .message("게임 설정이 변경되었습니다.")
-      .data(updatedSetting)
-      .build();
+    try {
+      Setting updatedSetting = settingService.updateSetting(gameRoom, settingRequestDto);
 
-    webSocket.convertAndSend("/sub/game/setting/" + gameRoom.getRoomId(), updatedSetting);
-    return httpResponse;
+      ResponseDto<Setting> socketResponse = ResponseDto.<Setting>builder()
+          .status(ResponseStatus.SUCCESS)
+          .message("게임 설정이 변경되었습니다.")
+          .data(updatedSetting)
+          .build();
+
+      webSocket.convertAndSend("/sub/game/setting/" + gameRoom.getRoomId(), socketResponse);
+    } catch(RuntimeException ex) {
+      ResponseDto<Setting> failResponse = ResponseDto.<Setting>builder()
+          .status(ResponseStatus.FAILURE)
+          .message(ex.getMessage())
+          .build();
+
+      webSocket.convertAndSend("/sub/game/error/" + settingRequestDto.getUserId(), failResponse);
+    }
   }
 }

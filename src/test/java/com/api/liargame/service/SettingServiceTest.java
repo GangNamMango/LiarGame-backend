@@ -1,9 +1,9 @@
 package com.api.liargame.service;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
 import com.api.liargame.controller.dto.request.EnterRequestDto;
+import com.api.liargame.controller.dto.request.SettingRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.Setting;
@@ -11,8 +11,6 @@ import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
 import com.api.liargame.exception.SettingPermissionException;
 import com.api.liargame.repository.GameRoomRepository;
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -69,8 +67,10 @@ public class SettingServiceTest {
         setting.setCapacity(5);
         setting.setTimeLimit(6);
         setting.setTopic("abc");
+        SettingRequestDto settingRequestDto = new SettingRequestDto(room.getRoomId(), host.getId(), setting);
+
         settingService.checkPermission(room, host.getId());
-        Setting newSetting = settingService.updateSetting(room, setting);
+        Setting newSetting = settingService.updateSetting(room, settingRequestDto);
         assertThat(newSetting.getTopic()).isEqualTo(newSetting.getTopic());
         assertThat(newSetting.getTimeLimit()).isEqualTo(newSetting.getTimeLimit());
         assertThat(newSetting.getCapacity()).isEqualTo(newSetting.getCapacity());
