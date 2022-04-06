@@ -10,7 +10,6 @@ import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
 import com.api.liargame.repository.GameRoomRepository;
-import com.api.liargame.service.GameRoomService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
@@ -127,7 +126,7 @@ class GameRoomControllerTest {
     Setting setting = new Setting();
     GameRoom gameRoom = GameRoom.builder()
         .host(user)
-        .settings(setting)
+        .setting(setting)
         .build();
 
     return gameRoom;

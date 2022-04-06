@@ -25,9 +25,9 @@ public class SettingServiceImpl implements SettingService{
     public Setting updateSetting(GameRoom gameRoom, SettingRequestDto settingRequestDto) {
         checkPermission(gameRoom, settingRequestDto.getUserId());
 
-        gameRoom.setSettings(settingRequestDto.getSetting());
+        gameRoom.setSetting(settingRequestDto.getSetting());
         gameRoom.update();
 
-        return gameRoom.getSettings();
+        return gameRoom.getSetting();
     }
 }

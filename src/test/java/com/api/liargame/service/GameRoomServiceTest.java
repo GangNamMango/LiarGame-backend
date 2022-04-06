@@ -40,7 +40,7 @@ class GameRoomServiceTest {
     return GameRoom.builder()
         .roomId("roomID")
         .host(user)
-        .settings(setting)
+        .setting(setting)
         .build();
   }
 
@@ -54,7 +54,7 @@ class GameRoomServiceTest {
 
     assertThat(room.getRoomId().length()).isEqualTo(5);
     assertThat(room.getHost().getNickname()).isEqualTo("user1");
-    assertThat(room.getSettings().getTimeLimit()).isEqualTo(SettingConstant.DEFAULT_TIME_LIMIT);
+    assertThat(room.getSetting().getTimeLimit()).isEqualTo(SettingConstant.DEFAULT_TIME_LIMIT);
     assertThat(room.getUsers().size()).isEqualTo(1);
   }
 

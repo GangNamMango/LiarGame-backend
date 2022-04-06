@@ -14,19 +14,19 @@ public class GameRoom {
   private final String roomId;
   private final Set<User> users = new HashSet<>();
   private User host;
-  private Setting settings;
+  private Setting setting;
   private final LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
   @Builder
-  public GameRoom(String roomId, User host, Setting settings) {
-    if (host == null || settings == null | host.getRole() != Role.HOST) {
+  public GameRoom(String roomId, User host, Setting setting) {
+    if (host == null || setting == null | host.getRole() != Role.HOST) {
       throw new IllegalStateException();
     }
     this.roomId = roomId;
     this.host = host;
     this.users.add(host);
-    this.settings = settings;
+    this.setting = setting;
     this.createdAt = LocalDateTime.now();
     this.updatedAt = LocalDateTime.now();
   }
@@ -55,8 +55,8 @@ public class GameRoom {
     this.host = user;
   }
 
-  public void setSettings(Setting settings) {
-    this.settings = settings;
+  public void setSetting(Setting setting) {
+    this.setting = setting;
   }
 
   public void setUpdatedAt(LocalDateTime updatedAt) {

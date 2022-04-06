@@ -28,7 +28,7 @@ class GameRoomTest {
     //when
     GameRoom gameRoom = GameRoom.builder()
         .host(user)
-        .settings(setting)
+        .setting(setting)
         .build();
     gameRoom.addUser(user2);
 
@@ -53,7 +53,7 @@ class GameRoomTest {
     Setting setting = new Setting();
     GameRoom gameRoom = GameRoom.builder()
         .host(user)
-        .settings(setting)
+        .setting(setting)
         .build();
     gameRoom.addUser(user2);
 
@@ -80,7 +80,7 @@ class GameRoomTest {
     Setting setting = new Setting();
     GameRoom gameRoom = GameRoom.builder()
         .host(originalHost)
-        .settings(setting)
+        .setting(setting)
         .build();
 
     gameRoom.changeHost(changeHost);
@@ -116,7 +116,7 @@ class GameRoomTest {
     Setting setting = new Setting();
     GameRoom gameRoom = GameRoom.builder()
         .host(user)
-        .settings(setting)
+        .setting(setting)
         .build();
 
     assertThrows(DuplicateUserNicknameException.class, () -> gameRoom.addUser(user2));

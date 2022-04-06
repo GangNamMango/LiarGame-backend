@@ -45,7 +45,7 @@ public class SettingServiceTest {
         Setting setting = new Setting();
         GameRoom gameRoom = GameRoom.builder()
             .host(user)
-            .settings(setting)
+            .setting(setting)
                 .build();
         String roomId = gameRoomRepository.save(gameRoom);
         UserRequestDto userRequestDto = new UserRequestDto("user2", "ch2");

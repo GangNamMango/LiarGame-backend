@@ -22,7 +22,7 @@ class MemoryGameRoomRepositoryTest {
 
     GameRoom gameRoom = GameRoom.builder()
         .host(user1)
-        .settings(setting)
+        .setting(setting)
         .build();
 
     gameRoom.addUser(user2);
@@ -43,7 +43,7 @@ class MemoryGameRoomRepositoryTest {
 
     GameRoom gameRoom = GameRoom.builder()
         .host(user1)
-        .settings(setting)
+        .setting(setting)
         .build();
 
     gameRoomRepository.save(gameRoom);
@@ -62,7 +62,7 @@ class MemoryGameRoomRepositoryTest {
 
     GameRoom gameRoom = GameRoom.builder()
         .host(user1)
-        .settings(setting)
+        .setting(setting)
         .build();
 
     String roomId = gameRoomRepository.save(gameRoom);

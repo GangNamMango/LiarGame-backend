@@ -13,13 +13,13 @@ public class GameRoomResponseDto {
 
   private final String roomId;
   private final List<UserResponseDto> users;
-  private final Setting settings;
+  private final Setting setting;
 
   public GameRoomResponseDto(GameRoom gameRoom) {
     Set<User> users = gameRoom.getUsers();
 
     this.roomId = gameRoom.getRoomId();
     this.users = users.stream().map(UserResponseDto::new).collect(Collectors.toList());
-    this.settings = gameRoom.getSettings();
+    this.setting = gameRoom.getSetting();
   }
 }
