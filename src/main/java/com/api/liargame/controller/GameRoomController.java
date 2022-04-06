@@ -92,10 +92,10 @@ public class GameRoomController {
 
     GameRoomResponseDto gameRoomResponse = new GameRoomResponseDto(gameRoom);
 
-    ResponseDto<?> socketResponse = ResponseDto.<GameRoomResponseDto>builder()
+    ResponseDto<?> socketResponse = ResponseDto.<List<UserResponseDto>>builder()
         .status(ResponseStatus.SUCCESS)
         .message(leavedUser.getNickname() + "님이 대기실을 나갔습니다.")
-        .data(gameRoomResponse)
+        .data(gameRoomResponse.getUsers())
         .build();
 
     webSocket.convertAndSend("/sub/game/leave/" + roomId, socketResponse);

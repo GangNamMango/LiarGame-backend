@@ -56,6 +56,8 @@ public class GameRoom {
   }
 
   public void setSetting(Setting setting) {
+    //TODO : Setting Validation
+
     this.setting = setting;
   }
 
