@@ -13,25 +13,24 @@ import com.api.liargame.controller.dto.response.UserResponseDto;
 import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
-import com.api.liargame.exception.SettingPermissionException;
 import com.api.liargame.service.GameRoomService;
 import com.api.liargame.service.SettingService;
-
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.HttpClientErrorException.BadRequest;
 
 
 @Controller
+@CrossOrigin("*")
 @ResponseBody
 @RequiredArgsConstructor
 @RequestMapping("/game")
