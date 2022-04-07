@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.api.liargame.constants.SettingConstant;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
+import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.Setting;
@@ -171,5 +172,50 @@ class GameRoomServiceTest {
     assertThat(leavedUser.getId()).isEqualTo(host.getId());
     assertThat(foundGameRoom).isNull();
     assertThat(foundUser).isNull();
+  }
+
+  @Test
+  @DisplayName("프로필 변경이 가능해야한다.")
+  void update_profile() {
+    String roomId = "test-room-id";
+
+    User host = new User("test", Role.HOST, "ch0");
+    GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
+    userRepository.save(host);
+    gameRoomRepository.save(gameRoom);
+
+    UpdateProfileRequestDto updateProfileRequestDto = new UpdateProfileRequestDto(
+        roomId,
+        host.getId(),
+        "changeNickname",
+        "ch2");
+
+    User changedUser = gameRoomService.updateUserProfile(updateProfileRequestDto);
+
+    assertThat(changedUser.getNickname()).isEqualTo(updateProfileRequestDto.getNickname());
+    assertThat(changedUser.getCharacter()).isEqualTo(updateProfileRequestDto.getCharacter());
+  }
+
+  @Test
+  @DisplayName("null값이 들어올경우 기존값을 유지해야 한다.")
+  void update_profile_with_null() {
+    String roomId = "test-room-id";
+    String userId = "test";
+
+    User host = new User(userId, Role.HOST, "ch0");
+    GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
+    userRepository.save(host);
+    gameRoomRepository.save(gameRoom);
+
+    UpdateProfileRequestDto updateProfileRequestDto = new UpdateProfileRequestDto(
+        roomId,
+        host.getId(),
+        null,
+        "ch2");
+
+    User changedUser = gameRoomService.updateUserProfile(updateProfileRequestDto);
+
+    assertThat(changedUser.getNickname()).isEqualTo(userId);
+    assertThat(changedUser.getCharacter()).isEqualTo(updateProfileRequestDto.getCharacter());
   }
 }

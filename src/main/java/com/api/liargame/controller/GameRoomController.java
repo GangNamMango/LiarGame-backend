@@ -3,6 +3,7 @@ package com.api.liargame.controller;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.LeaveRequestDto;
 import com.api.liargame.controller.dto.request.SettingRequestDto;
+import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.controller.dto.response.CreateResponseDto;
 import com.api.liargame.controller.dto.response.EnterResponseDto;
@@ -116,12 +117,38 @@ public class GameRoomController {
 
       webSocket.convertAndSend("/sub/game/setting/" + gameRoom.getRoomId(), socketResponse);
     } catch(RuntimeException ex) {
-      ResponseDto<Setting> failResponse = ResponseDto.<Setting>builder()
+      ResponseDto<?> failResponse = ResponseDto.builder()
           .status(ResponseStatus.FAILURE)
           .message(ex.getMessage())
           .build();
 
       webSocket.convertAndSend("/sub/game/error/" + settingRequestDto.getUserId(), failResponse);
     }
+  }
+
+  @MessageMapping("/profile")
+  public void updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto) {
+    try {
+      String roomId = updateProfileRequestDto.getRoomId();
+      gameRoomService.updateUserProfile(updateProfileRequestDto);
+      GameRoom updatedGameRoom = gameRoomService.find(roomId);
+      GameRoomResponseDto gameRoomResponseDto = new GameRoomResponseDto(updatedGameRoom);
+
+      ResponseDto<?> socketResponse = ResponseDto.<List<UserResponseDto>>builder()
+          .status(ResponseStatus.SUCCESS)
+          .message("프로필이 변경되었습니다.")
+          .data(gameRoomResponseDto.getUsers())
+          .build();
+
+      webSocket.convertAndSend("/sub/game/profile/" + roomId, socketResponse);
+    } catch (RuntimeException ex) {
+      ResponseDto<?> failResponse = ResponseDto.builder()
+          .status(ResponseStatus.FAILURE)
+          .message(ex.getMessage())
+          .build();
+
+      webSocket.convertAndSend("/sub/game/error/" + updateProfileRequestDto.getUserId(), failResponse);
+    }
+
   }
 }
