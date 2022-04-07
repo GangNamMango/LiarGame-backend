@@ -39,6 +39,8 @@ public class User {
   }
 
   public void setNickname(String nickname) {
+    if (nickname == null) return;
+
     this.nickname = nickname;
   }
 
@@ -51,6 +53,8 @@ public class User {
   }
 
   public void setCharacter(String character) {
+    if(character == null) return;
+
     this.character = character;
   }
 
@@ -58,7 +62,7 @@ public class User {
     this.updatedAt = updatedAt;
   }
 
-  private void update() {
+  public void update() {
     setUpdatedAt(LocalDateTime.now());
   }
 }

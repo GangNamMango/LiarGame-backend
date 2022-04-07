@@ -1,6 +1,7 @@
 package com.api.liargame.service;
 
 import com.api.liargame.controller.dto.request.EnterRequestDto;
+import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.Setting;
@@ -83,6 +84,28 @@ public class GameRoomServiceImpl implements GameRoomService {
     gameRoom.update();
 
     userRepository.delete(user.getId());
+
+    return user;
+  }
+
+  @Override
+  public User updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto) {
+    GameRoom gameRoom = gameRoomRepository.findById(updateProfileRequestDto.getRoomId());
+    if (gameRoom == null)
+      throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
+
+    User user = gameRoom.getUsers()
+        .stream()
+        .filter(u -> u.getId().equals(updateProfileRequestDto.getUserId()))
+        .findAny()
+        .orElse(null);
+    if (user == null)
+        throw new IllegalStateException("대기실에 존재하지 않는 유저입니다.");
+
+    user.setNickname(updateProfileRequestDto.getNickname());
+    user.setCharacter(updateProfileRequestDto.getCharacter());
+    user.update();
+    gameRoom.update();
 
     return user;
   }

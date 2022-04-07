@@ -1,6 +1,7 @@
 package com.api.liargame.service;
 
 import com.api.liargame.controller.dto.request.EnterRequestDto;
+import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.User;
@@ -14,6 +15,8 @@ public interface GameRoomService {
   GameRoom find(String roomId);
 
   User leave(String roomId, String userId);
+
+  User updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto);
 
   String createGameRoomId();
 
