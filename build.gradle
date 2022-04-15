@@ -27,6 +27,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	implementation 'org.springframework.boot:spring-boot-starter-logging'
+implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'com.google.code.gson:gson:2.9.0'
 }
 
 tasks.named('test') {
