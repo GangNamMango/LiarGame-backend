@@ -82,14 +82,14 @@ public class GameRoomController {
   }
 
   @MessageMapping("/leave")
-  public void leave(@Payload LeaveRequestDto leaveRequestDto) {
+  public ResponseDto<?> leave(@Payload LeaveRequestDto leaveRequestDto) {
     String roomId = leaveRequestDto.getRoomId();
     String userId = leaveRequestDto.getUserId();
     User leavedUser = gameRoomService.leave(roomId, userId);
     GameRoom gameRoom = gameRoomService.find(roomId);
 
     if (gameRoom == null)
-      return;
+      return new ResponseDto<>(ResponseStatus.FAILURE, "방이 존재하지 않습니다", null);
 
     GameRoomResponseDto gameRoomResponse = new GameRoomResponseDto(gameRoom);
 
@@ -100,10 +100,11 @@ public class GameRoomController {
         .build();
 
     webSocket.convertAndSend("/sub/game/leave/" + roomId, socketResponse);
+    return socketResponse;
   }
 
   @MessageMapping("/setting")
-  public void updateSetting(@Payload SettingRequestDto settingRequestDto) {
+  public ResponseDto<?> updateSetting(@Payload SettingRequestDto settingRequestDto) {
     String roomId = settingRequestDto.getRoomId();
     GameRoom gameRoom = gameRoomService.find(roomId);
     try {
@@ -116,6 +117,7 @@ public class GameRoomController {
           .build();
 
       webSocket.convertAndSend("/sub/game/setting/" + gameRoom.getRoomId(), socketResponse);
+      return socketResponse;
     } catch(RuntimeException ex) {
       ResponseDto<?> failResponse = ResponseDto.builder()
           .status(ResponseStatus.FAILURE)
@@ -123,11 +125,12 @@ public class GameRoomController {
           .build();
 
       webSocket.convertAndSend("/sub/game/error/" + settingRequestDto.getUserId(), failResponse);
+      return failResponse;
     }
   }
 
   @MessageMapping("/profile")
-  public void updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto) {
+  public ResponseDto<?> updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto) {
     try {
       String roomId = updateProfileRequestDto.getRoomId();
       gameRoomService.updateUserProfile(updateProfileRequestDto);
@@ -141,6 +144,7 @@ public class GameRoomController {
           .build();
 
       webSocket.convertAndSend("/sub/game/profile/" + roomId, socketResponse);
+      return socketResponse;
     } catch (RuntimeException ex) {
       ResponseDto<?> failResponse = ResponseDto.builder()
           .status(ResponseStatus.FAILURE)
@@ -148,7 +152,7 @@ public class GameRoomController {
           .build();
 
       webSocket.convertAndSend("/sub/game/error/" + updateProfileRequestDto.getUserId(), failResponse);
+      return failResponse;
     }
-
   }
 }
