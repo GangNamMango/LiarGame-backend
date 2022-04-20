@@ -34,6 +34,7 @@ public class GameRoomServiceImpl implements GameRoomService {
         .build();
     Setting defaultSetting = new Setting();
     GameRoom gameRoom = new GameRoom(roomId, user, defaultSetting);
+    userRepository.save(user);
     gameRoomRepository.save(gameRoom);
 
     return gameRoom;
@@ -65,6 +66,9 @@ public class GameRoomServiceImpl implements GameRoomService {
   public User leave(String roomId, String userId) {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
     User user = userRepository.findById(userId);
+
+    if (user == null)
+      throw new IllegalStateException("유저를 찾을 수 없습니다.");
 
     if (user.getRole() == Role.HOST) {
       Optional<User> nextHost = gameRoom
