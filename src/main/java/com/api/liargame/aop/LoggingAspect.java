@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,17 +37,16 @@ public class LoggingAspect {
     @Around("execution(* com.api.liargame..*Controller.*(..))")
     public Object logging(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         // -- request -- 
+        String requestId = UUID.randomUUID().toString();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(proceedingJoinPoint.getArgs()[0]);
-        log.info("\nrequest\n" + json);
-
+        log.info("\nrequest : "+ requestId +"\n" + json);
         // -- request -- 
         Object result = proceedingJoinPoint.proceed();
-
+        
         // -- response -- 
         String requestJson = gson.toJson(result);
-        log.info("\nresponse\n" + requestJson);
+        log.info("\nresponse: "+ requestId +"\n" + requestJson);
         return result;
     }
-
 }
