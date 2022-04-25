@@ -8,6 +8,7 @@ import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.domain.GameRoom;
+import com.api.liargame.domain.Info;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
@@ -217,5 +218,41 @@ class GameRoomServiceTest {
 
     assertThat(changedUser.getNickname()).isEqualTo(userId);
     assertThat(changedUser.getCharacter()).isEqualTo(updateProfileRequestDto.getCharacter());
+  }
+
+  @Test
+  @DisplayName("게임 정보를 생성할 수 있어야 한다.")
+  void gameInfo() {
+    String roomId = "test-room-id";
+    String userId = "test";
+
+    User host = new User(userId, Role.HOST, "ch0");
+    GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
+    userRepository.save(host);
+    gameRoomRepository.save(gameRoom);
+
+    Info gameInfo = gameRoomService.createGameInfo(roomId, host.getId());
+
+    assertThat(gameInfo.getLiar()).isNotNull();
+    assertThat(gameInfo.getTopic()).isNotNull();
+    assertThat(gameInfo.getWord()).isNotNull();
+  }
+
+  @Test
+  @DisplayName("호스트가 아니면 게임정보를 생성할 수 없다.")
+  void gameInfo_fail_when_not_host() {
+    String roomId = "test-room-id";
+    String userId = "test";
+
+    User host = new User(userId, Role.HOST, "ch0");
+    GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
+    userRepository.save(host);
+    gameRoomRepository.save(gameRoom);
+
+    User guest = new User("test-2", Role.HOST, "ch0");
+    userRepository.save(guest);
+    gameRoom.addUser(guest);
+
+    assertThrows(IllegalStateException.class,() -> gameRoomService.createGameInfo(roomId, guest.getId()));
   }
 }

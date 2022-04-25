@@ -7,20 +7,20 @@ import com.api.liargame.controller.dto.response.CounterResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto.ResponseStatus;
 import com.api.liargame.domain.GameRoom;
+import com.api.liargame.domain.Info;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
 import com.api.liargame.exception.NotFoundGameRoomException;
 import com.api.liargame.repository.GameRoomRepository;
 import com.api.liargame.repository.UserRepository;
-
+import com.api.liargame.repository.WordRepository;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +31,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   private final GameRoomRepository gameRoomRepository;
   private final UserRepository userRepository;
   private final SimpMessagingTemplate webSocket;
+  private final WordRepository wordRepository;
 
   @Override
   public GameRoom createRoom(UserRequestDto userRequestDto) {
@@ -127,6 +128,38 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   @Override
+  public Info createGameInfo(String roomId, String userId) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    if (gameRoom == null)
+      throw new NotFoundGameRoomException();
+
+    gameRoom.validateHost(userId);
+
+    String topic = gameRoom.getSetting().getTopic();
+    String word;
+
+    if (topic.equals("random")) {
+      word = wordRepository.findWordByRandomTopic();
+    } else {
+      word = wordRepository.findWordByTopic(topic);
+    }
+
+    User liar = getRandomLiar(gameRoom);
+
+    Info gameInfo = Info.create(liar, topic, word);
+    gameRoom.setInfo(gameInfo);
+
+    return gameInfo;
+  }
+
+  public User getRandomLiar(GameRoom gameRoom) {
+    ArrayList<User> users = new ArrayList<>(gameRoom.getUsers());
+
+    int randomIndex = new Random().nextInt(users.size());
+    return users.get(randomIndex);
+  }
+
+  @Override
   public String createGameRoomId() {
     while (true) {
       String roomId = randomRoomId();
@@ -150,7 +183,6 @@ public class GameRoomServiceImpl implements GameRoomService {
     return roomId;
   }
 
-
   @Override
   public void gameCountdown(String roomId) {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
@@ -159,7 +191,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     Timer timer = new Timer();
     TimerTask task = new TimerTask() {
     long time = gameRoom.getSetting().getTimeLimit();
-    
+
     CounterResponseDto counterResponseDto= new CounterResponseDto(time);
 
       ResponseDto<CounterResponseDto> response = ResponseDto.<CounterResponseDto>builder()

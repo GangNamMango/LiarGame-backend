@@ -5,6 +5,7 @@ import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.controller.dto.response.CounterResponseDto;
 import com.api.liargame.domain.GameRoom;
+import com.api.liargame.domain.Info;
 import com.api.liargame.domain.User;
 
 public interface GameRoomService {
@@ -18,6 +19,8 @@ public interface GameRoomService {
   User leave(String roomId, String userId);
 
   User updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto);
+
+  Info createGameInfo(String roomId, String userId);
 
   String createGameRoomId();
 

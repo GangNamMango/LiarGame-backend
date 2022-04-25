@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LeaveRequestDto {
+public class GameStartRequestDto {
   private String roomId;
   private String userId;
 }
