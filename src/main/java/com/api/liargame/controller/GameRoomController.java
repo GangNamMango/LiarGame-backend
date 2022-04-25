@@ -1,39 +1,34 @@
 package com.api.liargame.controller;
 
 import com.api.liargame.controller.dto.request.EnterRequestDto;
+import com.api.liargame.controller.dto.request.GameStartRequestDto;
 import com.api.liargame.controller.dto.request.LeaveRequestDto;
 import com.api.liargame.controller.dto.request.SettingRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
-import com.api.liargame.controller.dto.response.CounterResponseDto;
 import com.api.liargame.controller.dto.response.CreateResponseDto;
 import com.api.liargame.controller.dto.response.EnterResponseDto;
 import com.api.liargame.controller.dto.response.GameRoomResponseDto;
+import com.api.liargame.controller.dto.response.InfoResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto.ResponseStatus;
 import com.api.liargame.controller.dto.response.UserResponseDto;
 import com.api.liargame.domain.GameRoom;
+import com.api.liargame.domain.Info;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
-import com.api.liargame.repository.GameRoomRepository;
 import com.api.liargame.service.GameRoomService;
 import com.api.liargame.service.SettingService;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
@@ -48,6 +43,7 @@ public class GameRoomController {
   private final SimpMessagingTemplate webSocket;
   private final GameRoomService gameRoomService;
   private final SettingService settingService;
+
   @PostMapping("/enter")
   public ResponseDto<EnterResponseDto> enter(@RequestBody EnterRequestDto enterRequestDto) {
     User enteredUser = gameRoomService.enter(enterRequestDto);
@@ -67,9 +63,9 @@ public class GameRoomController {
         .message(enteredUser.getNickname() + "님이 입장하셨습니다.")
         .data(gameRoomDto.getUsers())
         .build();
-    
+
     webSocket.convertAndSend("/sub/game/enter/" + gameRoom.getRoomId(), socketResponse);
-    
+
     return httpResponse;
   }
 
@@ -162,7 +158,34 @@ public class GameRoomController {
 
       webSocket.convertAndSend("/sub/game/error/" + updateProfileRequestDto.getUserId(), failResponse);
       return failResponse;
-    }   
+    }
   }
 
+  @MessageMapping("/start")
+  public ResponseDto<?> start(GameStartRequestDto gameStartRequestDto) {
+    String roomId = gameStartRequestDto.getRoomId();
+    String userId = gameStartRequestDto.getUserId();
+
+    try {
+      Info gameInfo = gameRoomService.createGameInfo(roomId, userId);
+      InfoResponseDto infoResponseDto = InfoResponseDto.of(gameInfo);
+
+      ResponseDto<?> socketResponse = ResponseDto.<InfoResponseDto>builder()
+          .status(ResponseStatus.SUCCESS)
+          .message("게임 시작")
+          .data(infoResponseDto)
+          .build();
+
+      webSocket.convertAndSend("/sub/game/start/" + roomId, socketResponse);
+      return socketResponse;
+    } catch (RuntimeException ex) {
+      ResponseDto<?> failResponse = ResponseDto.builder()
+          .status(ResponseStatus.FAILURE)
+          .message(ex.getMessage())
+          .build();
+
+      webSocket.convertAndSend("/sub/game/error/" + userId, failResponse);
+      return failResponse;
+    }
+  }
 }

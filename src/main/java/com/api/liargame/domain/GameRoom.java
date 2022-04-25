@@ -14,6 +14,7 @@ public class GameRoom {
   private final String roomId;
   private final Set<User> users = new HashSet<>();
   private User host;
+  private Info info;
   private Setting setting;
   private final LocalDateTime createdAt;
   private LocalDateTime updatedAt;
@@ -67,5 +68,14 @@ public class GameRoom {
 
   public void update() {
     setUpdatedAt(LocalDateTime.now());
+  }
+
+  public void validateHost(String userId) {
+    if (!getHost().getId().equals(userId))
+      throw new IllegalStateException("방의 호스트가 아닙니다.");
+  }
+
+  public void setInfo(Info info) {
+    this.info = info;
   }
 }
