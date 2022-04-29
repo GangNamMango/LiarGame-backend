@@ -21,4 +21,6 @@ public interface GameRoomService {
   String createGameRoomId();
 
   String randomRoomId();
+
+  void gameCountdown(GameRoom gameRoom);
 }
