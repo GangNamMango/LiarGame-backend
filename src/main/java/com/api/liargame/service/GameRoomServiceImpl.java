@@ -4,15 +4,28 @@ import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.domain.GameRoom;
+import com.api.liargame.domain.GameTimer;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
 import com.api.liargame.exception.NotFoundGameRoomException;
 import com.api.liargame.repository.GameRoomRepository;
 import com.api.liargame.repository.UserRepository;
+
+import java.net.http.WebSocket;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.Builder.ObtainVia;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +34,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   private final GameRoomRepository gameRoomRepository;
   private final UserRepository userRepository;
+  private final SimpMessagingTemplate webSocket;
 
   @Override
   public GameRoom createRoom(UserRequestDto userRequestDto) {
@@ -132,5 +146,21 @@ public class GameRoomServiceImpl implements GameRoomService {
     }
 
     return roomId;
+  }
+
+
+  @Override
+  public void gameCountdown(GameRoom gameRoom) {
+    long delay = 1000L; // 1초후 실행
+    long period = 1000L; // 1초마다 실행
+
+    GameTimer gameTimer = new GameTimer();
+    gameTimer.setDelay(delay);
+    gameTimer.setPeriod(period);
+    gameTimer.setGameRoom(gameRoom);
+    gameTimer.setWebSocket(webSocket);
+
+    Thread timerThread = new Thread(gameTimer);
+    timerThread.start();
   }
 }

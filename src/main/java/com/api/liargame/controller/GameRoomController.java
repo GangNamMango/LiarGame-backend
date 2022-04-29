@@ -18,6 +18,7 @@ import com.api.liargame.service.GameRoomService;
 import com.api.liargame.service.SettingService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
@@ -60,8 +62,8 @@ public class GameRoomController {
         .message(enteredUser.getNickname() + "님이 입장하셨습니다.")
         .data(gameRoomDto.getUsers())
         .build();
-
     webSocket.convertAndSend("/sub/game/enter/" + gameRoom.getRoomId(), socketResponse);
+    
     return httpResponse;
   }
 
@@ -154,5 +156,7 @@ public class GameRoomController {
       webSocket.convertAndSend("/sub/game/error/" + updateProfileRequestDto.getUserId(), failResponse);
       return failResponse;
     }
+
+
   }
 }
