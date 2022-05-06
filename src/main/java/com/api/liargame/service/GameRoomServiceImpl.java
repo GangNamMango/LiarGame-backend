@@ -4,7 +4,6 @@ import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.domain.GameRoom;
-import com.api.liargame.domain.GameTimer;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
@@ -66,6 +65,8 @@ public class GameRoomServiceImpl implements GameRoomService {
 
     foundGameRoom.addUser(user);
     foundGameRoom.update();
+
+
 
     return user;
   }
@@ -153,14 +154,18 @@ public class GameRoomServiceImpl implements GameRoomService {
   public void gameCountdown(GameRoom gameRoom) {
     long delay = 1000L; // 1초후 실행
     long period = 1000L; // 1초마다 실행
-
-    GameTimer gameTimer = new GameTimer();
-    gameTimer.setDelay(delay);
-    gameTimer.setPeriod(period);
-    gameTimer.setGameRoom(gameRoom);
-    gameTimer.setWebSocket(webSocket);
-
-    Thread timerThread = new Thread(gameTimer);
-    timerThread.start();
+    Timer timer = new Timer();
+    TimerTask task = new TimerTask() {
+    long time = gameRoom.getSetting().getTimeLimit();
+      public void run() {
+        if (time >= 0) {
+          webSocket.convertAndSend("/sub/game/" + gameRoom.getRoomId() + "/countdown",
+              "gameId: " + gameRoom.getRoomId() + " - " + (time--));
+        } else {
+          timer.cancel();
+        }
+      }
+    };
+    timer.scheduleAtFixedRate(task, delay, period);
   }
 }
