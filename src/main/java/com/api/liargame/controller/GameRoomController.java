@@ -5,6 +5,7 @@ import com.api.liargame.controller.dto.request.LeaveRequestDto;
 import com.api.liargame.controller.dto.request.SettingRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
+import com.api.liargame.controller.dto.response.CounterResponseDto;
 import com.api.liargame.controller.dto.response.CreateResponseDto;
 import com.api.liargame.controller.dto.response.EnterResponseDto;
 import com.api.liargame.controller.dto.response.GameRoomResponseDto;
@@ -14,6 +15,7 @@ import com.api.liargame.controller.dto.response.UserResponseDto;
 import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
+import com.api.liargame.repository.GameRoomRepository;
 import com.api.liargame.service.GameRoomService;
 import com.api.liargame.service.SettingService;
 import java.util.List;
@@ -65,7 +67,7 @@ public class GameRoomController {
         .message(enteredUser.getNickname() + "님이 입장하셨습니다.")
         .data(gameRoomDto.getUsers())
         .build();
-  
+    
     webSocket.convertAndSend("/sub/game/enter/" + gameRoom.getRoomId(), socketResponse);
     
     return httpResponse;
@@ -106,6 +108,7 @@ public class GameRoomController {
         .build();
 
     webSocket.convertAndSend("/sub/game/leave/" + roomId, socketResponse);
+
     return socketResponse;
   }
 
