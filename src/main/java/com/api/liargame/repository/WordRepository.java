@@ -6,7 +6,5 @@ public interface WordRepository {
 
   String findWordByTopic(String topic);
 
-  String findWordByRandomTopic();
-
   List<String> findTopics();
 }
