@@ -3,6 +3,9 @@ package com.api.liargame.service;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
+import com.api.liargame.controller.dto.response.CounterResponseDto;
+import com.api.liargame.controller.dto.response.ResponseDto;
+import com.api.liargame.controller.dto.response.ResponseDto.ResponseStatus;
 import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
@@ -11,19 +14,13 @@ import com.api.liargame.exception.NotFoundGameRoomException;
 import com.api.liargame.repository.GameRoomRepository;
 import com.api.liargame.repository.UserRepository;
 
-import java.net.http.WebSocket;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.Builder.ObtainVia;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -155,16 +152,26 @@ public class GameRoomServiceImpl implements GameRoomService {
 
 
   @Override
-  public void gameCountdown(GameRoom gameRoom) {
+  public void gameCountdown(String roomId) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId);
     long delay = 1000L; // 1초후 실행
     long period = 1000L; // 1초마다 실행
     Timer timer = new Timer();
     TimerTask task = new TimerTask() {
     long time = gameRoom.getSetting().getTimeLimit();
+    
+    CounterResponseDto counterResponseDto= new CounterResponseDto(time);
+
+      ResponseDto<CounterResponseDto> response = ResponseDto.<CounterResponseDto>builder()
+        .status(ResponseStatus.SUCCESS)
+        .message("게임 진행 중..")
+        .data(counterResponseDto)
+        .build();
+
       public void run() {
-        if (time >= 0) {
-          webSocket.convertAndSend("/sub/game/" + gameRoom.getRoomId() + "/countdown",
-              "gameId: " + gameRoom.getRoomId() + " - " + (time--));
+        if (time-- > 0) {
+          counterResponseDto.setCount(time);
+          webSocket.convertAndSend("/sub/game/" + gameRoom.getRoomId() + "/countdown",response);
         } else {
           timer.cancel();
         }
