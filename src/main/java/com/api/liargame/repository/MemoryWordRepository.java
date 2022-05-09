@@ -28,6 +28,10 @@ public class MemoryWordRepository implements WordRepository {
 
   @Override
   public String findWordByTopic(String topic) {
+    if(topic.equals("random")) {
+      return findWordByRandomTopic();
+    }
+
     if (!db.containsKey(topic))
       throw new IllegalStateException("존재하지 않는 주제입니다.");
 
@@ -39,8 +43,7 @@ public class MemoryWordRepository implements WordRepository {
     return words.get(randomIndex);
   }
 
-  @Override
-  public String findWordByRandomTopic() {
+  private String findWordByRandomTopic() {
     List<String> topics = new ArrayList<>(db.keySet());
     int randomIndex = new Random().nextInt(db.keySet().size());
 
