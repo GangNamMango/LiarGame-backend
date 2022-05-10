@@ -1,29 +1,27 @@
 package com.api.liargame.repository;
 
-import com.google.gson.Gson;
-import java.io.FileReader;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class MemoryWordRepository implements WordRepository {
 
+  public static final String WORD_DB_PATH = "json/word.json";
   private final Map<String, List<String>> db;
 
-  public MemoryWordRepository() throws IOException {
-    ClassPathResource classPathResource = new ClassPathResource("json/word.json");
-    Path path = Paths.get(classPathResource.getURI());
-    Reader reader = new FileReader(path.toString());
 
-    db = new Gson().fromJson(reader, Map.class);
+  public MemoryWordRepository() throws IOException {
+    ClassLoader classLoader = getClass().getClassLoader();
+    InputStream inputStream = classLoader.getResourceAsStream(WORD_DB_PATH);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    db = objectMapper.readValue(inputStream, Map.class);
   }
 
   @Override
