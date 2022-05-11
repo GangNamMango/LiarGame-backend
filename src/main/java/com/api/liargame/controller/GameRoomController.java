@@ -1,5 +1,6 @@
 package com.api.liargame.controller;
 
+import com.api.liargame.controller.dto.request.ChoiceRequestDto;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.GameStartRequestDto;
 import com.api.liargame.controller.dto.request.LeaveRequestDto;
@@ -187,5 +188,25 @@ public class GameRoomController {
       webSocket.convertAndSend("/sub/game/error/" + userId, failResponse);
       return failResponse;
     }
+  }
+  
+  @MessageMapping("/pub/game/choice")
+  public ResponseDto<?> choice(ChoiceRequestDto choiceDto) {
+    GameRoom gameRoom = gameRoomService.find(choiceDto.getRoomId());
+    String roomId = gameRoom.getRoomId();
+    String liarId = choiceDto.getUserId();
+    if (!gameRoomService.isLiar(roomId, liarId))
+      throw new Exception();
+    boolean same = gameRoomService.isSame(roomId, choiceDto.getChoice());
+    if(!same){
+      return  ResponseDto<?> failResponse = ResponseDto.<String>builder()
+      .status(ResponseStatus.FAILURE)
+      .message("틀렸습니다")
+      .build();
+    }
+    return ResponseDto<?> successResponse = ResponseDto.<String>builder()
+    .status(ResponseStatus.SUCCESS)
+    .message("맞았습니다")
+    .build();
   }
 }

@@ -27,4 +27,8 @@ public interface GameRoomService {
   String randomRoomId();
 
   void gameCountdown(String roomId);
+
+  boolean isSame(String roomId, String word);
+  
+  boolean isLiar(String roomId, String liarId);
 }

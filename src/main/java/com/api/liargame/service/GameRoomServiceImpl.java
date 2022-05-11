@@ -108,6 +108,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Override
   public User updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto) {
     GameRoom gameRoom = gameRoomRepository.findById(updateProfileRequestDto.getRoomId());
+    // 이 부분을 레포지토리단으로 내리는게 좋을 거 같습니다.
     if (gameRoom == null)
       throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
 
@@ -116,6 +117,8 @@ public class GameRoomServiceImpl implements GameRoomService {
         .filter(u -> u.getId().equals(updateProfileRequestDto.getUserId()))
         .findAny()
         .orElse(null);
+
+    // 이 부분을 레포지토리단으로 내리는게 좋을 거 같습니다.
     if (user == null)
         throw new IllegalStateException("대기실에 존재하지 않는 유저입니다.");
 
@@ -177,6 +180,11 @@ public class GameRoomServiceImpl implements GameRoomService {
     return roomId;
   }
 
+  /*
+    컨트롤러의 역할같은 느낌이라 프록시를 써서 Run부분을 떄어내서
+    컨트롤러에서 run 부분만 보이게 하는 방식으로 구현하는게 좋아 보입니다.
+    프록시 패턴..?
+  */
   @Override
   public void gameCountdown(String roomId) {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
@@ -184,25 +192,48 @@ public class GameRoomServiceImpl implements GameRoomService {
     long period = 1000L; // 1초마다 실행
     Timer timer = new Timer();
     TimerTask task = new TimerTask() {
-    long time = gameRoom.getSetting().getTimeLimit();
+      long time = gameRoom.getSetting().getTimeLimit();
 
-    CounterResponseDto counterResponseDto= new CounterResponseDto(time);
+      CounterResponseDto counterResponseDto = new CounterResponseDto(time);
 
       ResponseDto<CounterResponseDto> response = ResponseDto.<CounterResponseDto>builder()
-        .status(ResponseStatus.SUCCESS)
-        .message("게임 진행 중..")
-        .data(counterResponseDto)
-        .build();
+          .status(ResponseStatus.SUCCESS)
+          .message("게임 진행 중..")
+          .data(counterResponseDto)
+          .build();
 
       public void run() {
         if (time-- > 0) {
           counterResponseDto.setCount(time);
-          webSocket.convertAndSend("/sub/game/" + gameRoom.getRoomId() + "/countdown",response);
+          webSocket.convertAndSend("/sub/game/" + gameRoom.getRoomId() + "/countdown", response);
         } else {
           timer.cancel();
         }
       }
     };
     timer.scheduleAtFixedRate(task, delay, period);
+  }
+  
+
+  //infoRepository 를 만들어서 get..?
+  @Override
+  public boolean isLiar(String roomId, String liarId) {
+  
+    GameRoom gameRoom = gameRoomRepository.findById(roomId); // 에러 레포단이나 도메인단으로 내리기..?
+    User realLiar = gameRoom.getInfo().getLiar();
+    if (realLiar.getId().equals(liarId)) {
+      return true;
+    }
+    return false;
+    // throw new IllegalStateException("존재하지 않는 주제입니다.");
+  }
+  @Override
+  public boolean isSame(String roomId, String liarWord) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId); // 에러 발생
+    String gameRoomWord = gameRoom.getInfo().getWord();
+    if (gameRoomWord.equals(liarWord)) {
+      return true;
+    }
+    return false;
   }
 }
