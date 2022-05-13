@@ -16,6 +16,7 @@ public class GameRoom {
   private User host;
   private Info info;
   private Setting setting;
+  private GameStatus gameStatus;
   private final LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
@@ -28,6 +29,7 @@ public class GameRoom {
     this.host = host;
     this.users.add(host);
     this.setting = setting;
+    this.gameStatus = GameStatus.WAITING;
     this.createdAt = LocalDateTime.now();
     this.updatedAt = LocalDateTime.now();
   }
@@ -77,5 +79,9 @@ public class GameRoom {
 
   public void setInfo(Info info) {
     this.info = info;
+  }
+
+  public void setGameStatus(GameStatus gameStatus) {
+    this.gameStatus = gameStatus;
   }
 }
