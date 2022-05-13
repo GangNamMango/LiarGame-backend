@@ -21,6 +21,8 @@ public class User {
   private Role role;
   private GameRole gameRole;
   private String character;
+  private boolean vote;
+  private int voteCount;
   private final LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
@@ -34,6 +36,8 @@ public class User {
     this.role = role;
     this.gameRole = GameRole.MEMBER;
     this.character = character;
+    this.vote = false;
+    this.voteCount = 0;
     this.createdAt = LocalDateTime.now();
     this.updatedAt = LocalDateTime.now();
   }
@@ -62,7 +66,15 @@ public class User {
     this.updatedAt = updatedAt;
   }
 
+  public void setVote(boolean vote) {
+    this.vote = vote;
+  }
+
   public void update() {
     setUpdatedAt(LocalDateTime.now());
+  }
+
+  public void addVoteCount() {
+    this.voteCount += 1;
   }
 }

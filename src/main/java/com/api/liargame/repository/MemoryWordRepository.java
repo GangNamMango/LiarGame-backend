@@ -26,7 +26,7 @@ public class MemoryWordRepository implements WordRepository {
 
   @Override
   public String findWordByTopic(String topic) {
-    if(topic.equals("random")) {
+    if(topic.equals("랜덤")) {
       return findWordByRandomTopic();
     }
 

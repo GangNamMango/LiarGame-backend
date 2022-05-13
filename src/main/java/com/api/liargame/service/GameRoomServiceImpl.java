@@ -11,12 +11,14 @@ import com.api.liargame.domain.GameStatus;
 import com.api.liargame.domain.Info;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
+import com.api.liargame.domain.User.GameRole;
 import com.api.liargame.domain.User.Role;
 import com.api.liargame.exception.NotFoundGameRoomException;
 import com.api.liargame.repository.GameRoomRepository;
 import com.api.liargame.repository.UserRepository;
 import com.api.liargame.repository.WordRepository;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Timer;
@@ -112,14 +114,7 @@ public class GameRoomServiceImpl implements GameRoomService {
       throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
     }
 
-    User user = gameRoom.getUsers()
-        .stream()
-        .filter(u -> u.getId().equals(updateProfileRequestDto.getUserId()))
-        .findAny()
-        .orElse(null);
-    if (user == null) {
-      throw new IllegalStateException("대기실에 존재하지 않는 유저입니다.");
-    }
+    User user = isExistUserInGame(updateProfileRequestDto.getUserId(), gameRoom);
 
     user.setNickname(updateProfileRequestDto.getNickname());
     user.setCharacter(updateProfileRequestDto.getCharacter());
@@ -142,6 +137,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     String word = wordRepository.findWordByTopic(topic);
 
     User liar = getRandomLiar(gameRoom);
+    liar.setGameRole(GameRole.LIAR);
 
     Info gameInfo = Info.create(liar, topic, word);
     gameRoom.setInfo(gameInfo);
@@ -203,6 +199,7 @@ public class GameRoomServiceImpl implements GameRoomService {
       public void run() {
         if (time < 1) {
           counterResponseDto.setGameStatus(GameStatus.VOTE.name());
+          gameRoom.setGameStatus(GameStatus.VOTE);
           timer.cancel();
         }
         counterResponseDto.setCount(time);
@@ -211,5 +208,47 @@ public class GameRoomServiceImpl implements GameRoomService {
       }
     };
     timer.scheduleAtFixedRate(task, delay, period);
+  }
+
+  @Override
+  public List<User> vote(String roomId, String userId, String voteTo) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    if (gameRoom == null) {
+      throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
+    }
+
+    if (!gameRoom.getGameStatus().equals(GameStatus.VOTE)) {
+      throw new IllegalStateException("현재 투표 진행 중이 아닙니다.");
+    }
+
+    //투표자 유저 검증
+    User user = isExistUserInGame(userId, gameRoom);
+    if (user.isVote()) {
+      throw new IllegalStateException("이미 투표한 유저입니다.");
+    }
+
+    //피투표자? 유저 검증
+    User votedUser = gameRoom.getUsers().stream()
+        .filter(u -> u.getNickname().equals(voteTo))
+        .findAny()
+        .orElseThrow(() -> {
+          throw new IllegalArgumentException("존재하지 않는 유저에게 투표할 수 없습니다." + voteTo);
+        });
+
+    //투표 처리
+    gameRoom.vote(user, votedUser);
+
+    return new ArrayList<>(gameRoom.getUsers());
+  }
+
+
+  private User isExistUserInGame(String userId, GameRoom gameRoom) {
+    return gameRoom.getUsers()
+        .stream()
+        .filter(u -> u.getId().equals(userId))
+        .findAny()
+        .orElseThrow(() -> {
+          throw new IllegalArgumentException("게임 방에 존재하지 않는 유저입니다.");
+        });
   }
 }

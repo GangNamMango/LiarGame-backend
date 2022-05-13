@@ -6,6 +6,7 @@ import com.api.liargame.controller.dto.request.LeaveRequestDto;
 import com.api.liargame.controller.dto.request.SettingRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
+import com.api.liargame.controller.dto.request.VoteRequestDto;
 import com.api.liargame.controller.dto.response.CreateResponseDto;
 import com.api.liargame.controller.dto.response.EnterResponseDto;
 import com.api.liargame.controller.dto.response.GameRoomResponseDto;
@@ -189,4 +190,35 @@ public class GameRoomController {
       return failResponse;
     }
   }
+
+  @MessageMapping("/vote")
+  public ResponseDto<?> vote(VoteRequestDto voteRequestDto) {
+    String roomId = voteRequestDto.getRoomId();
+    String userId = voteRequestDto.getUserId();
+    String voteTo = voteRequestDto.getVoteTo();
+
+    try{
+      List<User> users = gameRoomService.vote(roomId, userId, voteTo);
+
+      ResponseDto<?> socketResponse = ResponseDto.builder()
+          .status(ResponseStatus.SUCCESS)
+          .message("투표 완료")
+          .data(users)
+          .build();
+
+      //TODO :: 투표 종료되었는지 확인 후 결과 보내는 메소드 필요
+
+      webSocket.convertAndSend("/sub/game/vote/" + roomId, socketResponse);
+      return socketResponse;
+    } catch (RuntimeException ex) {
+      ResponseDto<?> failResponse = ResponseDto.builder()
+          .status(ResponseStatus.FAILURE)
+          .message(ex.getMessage())
+          .build();
+
+      webSocket.convertAndSend("/sub/game/error/" + userId, failResponse);
+      return failResponse;
+    }
+  }
+
 }
