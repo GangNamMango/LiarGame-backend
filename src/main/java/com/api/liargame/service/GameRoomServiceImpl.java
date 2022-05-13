@@ -108,7 +108,6 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Override
   public User updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto) {
     GameRoom gameRoom = gameRoomRepository.findById(updateProfileRequestDto.getRoomId());
-    // 이 부분을 레포지토리단으로 내리는게 좋을 거 같습니다.
     if (gameRoom == null)
       throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
 
@@ -118,7 +117,6 @@ public class GameRoomServiceImpl implements GameRoomService {
         .findAny()
         .orElse(null);
 
-    // 이 부분을 레포지토리단으로 내리는게 좋을 거 같습니다.
     if (user == null)
         throw new IllegalStateException("대기실에 존재하지 않는 유저입니다.");
 
@@ -217,23 +215,23 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   //infoRepository 를 만들어서 get..?
   @Override
-  public boolean isLiar(String roomId, String liarId) {
-  
-    GameRoom gameRoom = gameRoomRepository.findById(roomId); // 에러 레포단이나 도메인단으로 내리기..?
+  public void isLiar(String roomId, String liarId) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId); 
+    if (gameRoom == null)
+      throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
     User realLiar = gameRoom.getInfo().getLiar();
-    if (realLiar.getId().equals(liarId)) {
-      return true;
-    }
-    return false;
-    // throw new IllegalStateException("존재하지 않는 주제입니다.");
+    if (realLiar.getId().equals(liarId))
+      throw new IllegalStateException("당신은 라이어가 아닙니다.");
   }
+  
   @Override
-  public boolean isSame(String roomId, String liarWord) {
-    GameRoom gameRoom = gameRoomRepository.findById(roomId); // 에러 발생
+  public void isSame(String roomId, String liarWord) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    if (gameRoom == null)
+      throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
+
     String gameRoomWord = gameRoom.getInfo().getWord();
-    if (gameRoomWord.equals(liarWord)) {
-      return true;
-    }
-    return false;
+    if (gameRoomWord.equals(liarWord)) 
+      throw new IllegalStateException("단어를 못맞추셨습니다.");
   }
 }
