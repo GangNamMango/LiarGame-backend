@@ -183,7 +183,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   @Override
-  public void gameCountdown(String roomId) {
+  public void gameCountdown(String roomId, String event) {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
     long delay = 1000L; // 1초후 실행
     long period = 1000L; // 1초마다 실행
@@ -201,14 +201,13 @@ public class GameRoomServiceImpl implements GameRoomService {
           .build();
 
       public void run() {
-        counterResponseDto.setCount(time);
-        if (time-- > 0) {
-          webSocket.convertAndSend("/sub/game/" + gameRoom.getRoomId() + "/countdown", response);
-        } else {
+        if (time < 1) {
           counterResponseDto.setGameStatus(GameStatus.VOTE.name());
-          webSocket.convertAndSend("/sub/game/" + gameRoom.getRoomId() + "/countdown", response);
           timer.cancel();
         }
+        counterResponseDto.setCount(time);
+        webSocket.convertAndSend(event, response);
+        time--;
       }
     };
     timer.scheduleAtFixedRate(task, delay, period);

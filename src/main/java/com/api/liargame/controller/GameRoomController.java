@@ -176,7 +176,7 @@ public class GameRoomController {
           .data(infoResponseDto)
           .build();
 
-      gameRoomService.gameCountdown(roomId);
+      gameRoomService.gameCountdown(roomId, "/sub/game/countdown/" + roomId);
       webSocket.convertAndSend("/sub/game/start/" + roomId, socketResponse);
       return socketResponse;
     } catch (RuntimeException ex) {

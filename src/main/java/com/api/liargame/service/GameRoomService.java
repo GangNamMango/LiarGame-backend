@@ -25,5 +25,5 @@ public interface GameRoomService {
 
   String randomRoomId();
 
-  void gameCountdown(String roomId);
+  void gameCountdown(String roomId, String event);
 }
