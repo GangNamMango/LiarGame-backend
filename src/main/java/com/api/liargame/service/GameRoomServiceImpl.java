@@ -7,6 +7,7 @@ import com.api.liargame.controller.dto.response.CounterResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto.ResponseStatus;
 import com.api.liargame.domain.GameRoom;
+import com.api.liargame.domain.GameStatus;
 import com.api.liargame.domain.Info;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
@@ -143,6 +144,8 @@ public class GameRoomServiceImpl implements GameRoomService {
     Info gameInfo = Info.create(liar, topic, word);
     gameRoom.setInfo(gameInfo);
 
+    gameRoom.setGameStatus(GameStatus.PROGRESS);
+
     return gameInfo;
   }
 
@@ -186,7 +189,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     TimerTask task = new TimerTask() {
     long time = gameRoom.getSetting().getTimeLimit();
 
-    CounterResponseDto counterResponseDto= new CounterResponseDto(time);
+    CounterResponseDto counterResponseDto= new CounterResponseDto(time, gameRoom.getGameStatus().name());
 
       ResponseDto<CounterResponseDto> response = ResponseDto.<CounterResponseDto>builder()
         .status(ResponseStatus.SUCCESS)

@@ -12,6 +12,7 @@ import lombok.Getter;
 public class GameRoomResponseDto {
 
   private final String roomId;
+  private final String gameStatus;
   private final List<UserResponseDto> users;
   private final Setting setting;
 
@@ -20,6 +21,7 @@ public class GameRoomResponseDto {
 
     this.roomId = gameRoom.getRoomId();
     this.users = users.stream().map(UserResponseDto::new).collect(Collectors.toList());
+    this.gameStatus = gameRoom.getGameStatus().name();
     this.setting = gameRoom.getSetting();
   }
 }
