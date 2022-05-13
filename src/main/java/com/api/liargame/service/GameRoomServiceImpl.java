@@ -66,8 +66,6 @@ public class GameRoomServiceImpl implements GameRoomService {
     foundGameRoom.addUser(user);
     foundGameRoom.update();
 
-
-
     return user;
   }
 
@@ -81,8 +79,9 @@ public class GameRoomServiceImpl implements GameRoomService {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
     User user = userRepository.findById(userId);
 
-    if (user == null)
+    if (user == null) {
       throw new IllegalStateException("유저를 찾을 수 없습니다.");
+    }
 
     if (user.getRole() == Role.HOST) {
       Optional<User> nextHost = gameRoom
@@ -91,9 +90,9 @@ public class GameRoomServiceImpl implements GameRoomService {
           .filter(u -> !u.getId().equals(userId))
           .findAny();
 
-      if (nextHost.isPresent())
+      if (nextHost.isPresent()) {
         gameRoom.changeHost(nextHost.get());
-      else {
+      } else {
         gameRoomRepository.delete(gameRoom.getRoomId());
       }
     }
@@ -109,16 +108,18 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Override
   public User updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto) {
     GameRoom gameRoom = gameRoomRepository.findById(updateProfileRequestDto.getRoomId());
-    if (gameRoom == null)
+    if (gameRoom == null) {
       throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
+    }
 
     User user = gameRoom.getUsers()
         .stream()
         .filter(u -> u.getId().equals(updateProfileRequestDto.getUserId()))
         .findAny()
         .orElse(null);
-    if (user == null)
-        throw new IllegalStateException("대기실에 존재하지 않는 유저입니다.");
+    if (user == null) {
+      throw new IllegalStateException("대기실에 존재하지 않는 유저입니다.");
+    }
 
     user.setNickname(updateProfileRequestDto.getNickname());
     user.setCharacter(updateProfileRequestDto.getCharacter());
@@ -131,8 +132,9 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Override
   public Info createGameInfo(String roomId, String userId) {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
-    if (gameRoom == null)
+    if (gameRoom == null) {
       throw new NotFoundGameRoomException();
+    }
 
     gameRoom.validateHost(userId);
 
@@ -187,21 +189,24 @@ public class GameRoomServiceImpl implements GameRoomService {
     long period = 1000L; // 1초마다 실행
     Timer timer = new Timer();
     TimerTask task = new TimerTask() {
-    long time = gameRoom.getSetting().getTimeLimit();
+      long time = gameRoom.getSetting().getTimeLimit();
 
-    CounterResponseDto counterResponseDto= new CounterResponseDto(time, gameRoom.getGameStatus().name());
+      CounterResponseDto counterResponseDto = new CounterResponseDto(time,
+          gameRoom.getGameStatus().name());
 
       ResponseDto<CounterResponseDto> response = ResponseDto.<CounterResponseDto>builder()
-        .status(ResponseStatus.SUCCESS)
-        .message("게임 진행 중..")
-        .data(counterResponseDto)
-        .build();
+          .status(ResponseStatus.SUCCESS)
+          .message("게임 진행 중")
+          .data(counterResponseDto)
+          .build();
 
       public void run() {
+        counterResponseDto.setCount(time);
         if (time-- > 0) {
-          counterResponseDto.setCount(time);
-          webSocket.convertAndSend("/sub/game/" + gameRoom.getRoomId() + "/countdown",response);
+          webSocket.convertAndSend("/sub/game/" + gameRoom.getRoomId() + "/countdown", response);
         } else {
+          counterResponseDto.setGameStatus(GameStatus.VOTE.name());
+          webSocket.convertAndSend("/sub/game/" + gameRoom.getRoomId() + "/countdown", response);
           timer.cancel();
         }
       }

@@ -8,13 +8,13 @@ import lombok.Getter;
 @Builder
 public class InfoResponseDto {
 
-  private String liarName;
+  private String liarId;
   private String topic;
   private String word;
 
   public static InfoResponseDto of(Info info) {
     return InfoResponseDto.builder()
-        .liarName(info.getLiar().getNickname())
+        .liarId(info.getLiar().getId())
         .topic(info.getTopic())
         .word(info.getWord())
         .build();
