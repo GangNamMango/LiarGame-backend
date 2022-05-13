@@ -6,6 +6,7 @@ import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.Info;
 import com.api.liargame.domain.User;
+import java.util.List;
 
 public interface GameRoomService {
 
@@ -26,4 +27,6 @@ public interface GameRoomService {
   String randomRoomId();
 
   void gameCountdown(String roomId, String event);
+
+  List<User> vote(String roomId, String userId, String voteTo);
 }

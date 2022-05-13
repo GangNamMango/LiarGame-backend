@@ -39,4 +39,8 @@ public class MemoryGameRoomRepository implements GameRoomRepository{
   public List<GameRoom> findAll() {
     return new ArrayList<>(gameRoomMemory.values());
   }
+
+  public void clear() {
+    gameRoomMemory.clear();
+  }
 }

@@ -17,7 +17,7 @@ class MemoryWordRepositoryTest {
   @Test
   @DisplayName("topic이 주어졌을 때 랜덤한 단어를 받을 수 있다.")
   void test() {
-    String topic = "major";
+    String topic = "전공";
     List<String> words = wordRepository.findAllWordsByTopic(topic);
 
     for (int i=0; i<10; i++) {

@@ -17,6 +17,7 @@ public class GameRoom {
   private Info info;
   private Setting setting;
   private GameStatus gameStatus;
+  private int voteCompleteCount;
   private final LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
@@ -30,6 +31,7 @@ public class GameRoom {
     this.users.add(host);
     this.setting = setting;
     this.gameStatus = GameStatus.WAITING;
+    this.voteCompleteCount = 0;
     this.createdAt = LocalDateTime.now();
     this.updatedAt = LocalDateTime.now();
   }
@@ -84,4 +86,12 @@ public class GameRoom {
   public void setGameStatus(GameStatus gameStatus) {
     this.gameStatus = gameStatus;
   }
+
+  public void vote(User voteFrom, User voteTo) {
+    this.voteCompleteCount += 1;
+    voteFrom.setVote(true);
+    voteTo.addVoteCount();
+  }
+
+
 }
