@@ -220,7 +220,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     if (gameRoom == null)
       throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
     User realLiar = gameRoom.getInfo().getLiar();
-    if (realLiar.getId().equals(liarId))
+    if (!realLiar.getId().equals(liarId))
       throw new IllegalStateException("당신은 라이어가 아닙니다.");
   }
   
@@ -231,7 +231,7 @@ public class GameRoomServiceImpl implements GameRoomService {
       throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
 
     String gameRoomWord = gameRoom.getInfo().getWord();
-    if (gameRoomWord.equals(liarWord)) 
+    if (!gameRoomWord.equals(liarWord)) 
       throw new IllegalStateException("단어를 못맞추셨습니다.");
   }
 }
