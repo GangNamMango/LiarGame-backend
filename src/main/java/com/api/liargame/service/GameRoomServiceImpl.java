@@ -1,5 +1,6 @@
 package com.api.liargame.service;
 
+import com.api.liargame.controller.dto.request.ChoiceRequestDto;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
@@ -65,8 +66,6 @@ public class GameRoomServiceImpl implements GameRoomService {
     foundGameRoom.addUser(user);
     foundGameRoom.update();
 
-
-
     return user;
   }
 
@@ -118,7 +117,7 @@ public class GameRoomServiceImpl implements GameRoomService {
         .orElse(null);
 
     if (user == null)
-        throw new IllegalStateException("대기실에 존재하지 않는 유저입니다.");
+      throw new IllegalStateException("대기실에 존재하지 않는 유저입니다.");
 
     user.setNickname(updateProfileRequestDto.getNickname());
     user.setCharacter(updateProfileRequestDto.getCharacter());
@@ -211,27 +210,31 @@ public class GameRoomServiceImpl implements GameRoomService {
     };
     timer.scheduleAtFixedRate(task, delay, period);
   }
-  
 
-  //infoRepository 를 만들어서 get..?
   @Override
-  public void isLiar(String roomId, String liarId) {
-    GameRoom gameRoom = gameRoomRepository.findById(roomId); 
-    if (gameRoom == null)
-      throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
+  public void isLiar(GameRoom gameRoom,String liarId) {
     User realLiar = gameRoom.getInfo().getLiar();
     if (!realLiar.getId().equals(liarId))
       throw new IllegalStateException("당신은 라이어가 아닙니다.");
   }
-  
+
   @Override
-  public void isSame(String roomId, String liarWord) {
-    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+  public boolean isSame(GameRoom gameRoom, String liarWord) {
+    String gameRoomWord = gameRoom.getInfo().getWord();
+    if (gameRoomWord.equals(liarWord)) 
+      return true;
+    return false;
+  }
+
+  public boolean checkAnswer(ChoiceRequestDto choiceRequestDto) {
+    GameRoom gameRoom = gameRoomRepository.findById(choiceRequestDto.getRoomId());
     if (gameRoom == null)
       throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
 
-    String gameRoomWord = gameRoom.getInfo().getWord();
-    if (!gameRoomWord.equals(liarWord)) 
-      throw new IllegalStateException("단어를 못맞추셨습니다.");
+    String liar = choiceRequestDto.getUserId();
+    String requestedWord = choiceRequestDto.getChoice();
+   
+    isLiar(gameRoom, liar);
+    return isSame(gameRoom, requestedWord); 
   }
 }

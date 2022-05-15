@@ -287,35 +287,13 @@ class GameRoomServiceTest {
 
     gameRoom.setInfo(info);
 
-    assertThrows(IllegalStateException.class, () -> gameRoomService.isLiar(gameRoom.getRoomId(), guest.getId()));
-    assertThrows(IllegalStateException.class, () -> gameRoomService.isLiar(gameRoom.getRoomId(), host.getId()));
+    assertThrows(IllegalStateException.class, () -> gameRoomService.isLiar(gameRoom, guest.getId()));
+    assertThrows(IllegalStateException.class, () -> gameRoomService.isLiar(gameRoom, host.getId()));
   }
 
-
-  @Test
-  @DisplayName("방의 제시어와 다를 경우 에러가 나야한다.")
-  void fail_when_not_equal_word() {
-    String roomId = "test-room-id";
-    String userId = "test";
-
-    User host = new User(userId, Role.HOST, "ch0");
-    GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
-    userRepository.save(host);
-    gameRoomRepository.save(gameRoom);
-
-    String topic = gameRoom.getSetting().getTopic();
-    String word = "word";
-    Info info = Info.create(host, topic, word);
-
-    gameRoom.setInfo(info);
-
-    assertThrows(IllegalStateException.class, () -> gameRoomService.isSame(gameRoom.getRoomId(), "test1"));
-    assertThrows(IllegalStateException.class, () -> gameRoomService.isSame(gameRoom.getRoomId(), "test2"));
-  }
-  
   @Test
   @DisplayName("라이어야한다.")
-  void liar() {
+  void is_liar() {
     String roomId = "test-room-id";
     String userId = "test";
 
@@ -333,26 +311,28 @@ class GameRoomServiceTest {
     Info info = Info.create(guest, topic, word);
 
     gameRoom.setInfo(info);
-    gameRoomService.isLiar(roomId, guest.getId());
+    gameRoomService.isLiar(gameRoom, guest.getId());
   }
 
   @Test
   @DisplayName("해당 방의 제시어와 같아야한다.")
-  void word() {
+  void compare_word() {
     String roomId = "test-room-id";
     String userId = "test";
-
+    String gameRoomWord = "word";
+    String sameWord = "word";
+    String anotherWord = "word2";
     User host = new User(userId, Role.HOST, "ch0");
     GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
     userRepository.save(host);
     gameRoomRepository.save(gameRoom);
 
     String topic = gameRoom.getSetting().getTopic();
-    String word = "word";
-    Info info = Info.create(host, topic, word);
+    Info info = Info.create(host, topic, gameRoomWord);
 
     gameRoom.setInfo(info);
-    gameRoomService.isSame(roomId, "word");
+    assertThat(gameRoomService.isSame(gameRoom, sameWord)).isEqualTo(true);
+    assertThat(gameRoomService.isSame(gameRoom, anotherWord)).isEqualTo(false);
   }
 }
 

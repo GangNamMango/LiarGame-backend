@@ -192,36 +192,42 @@ public class GameRoomController {
   
   @MessageMapping("/pub/game/choice")
   public ResponseDto<?> choice(ChoiceRequestDto choiceDto) {
-    GameRoom gameRoom = gameRoomService.find(choiceDto.getRoomId());
-    String roomId = gameRoom.getRoomId();
-    String liarId = choiceDto.getUserId();
-    try{
-      gameRoomService.isLiar(roomId, liarId);
-      gameRoomService.isSame(roomId, choiceDto.getChoice());  
-      ResponseDto<?> socketResponse = ResponseDto.builder()
-      .status(ResponseStatus.SUCCESS)
-      .message("맞았습니다")
-      .data("단어 맞춤")
-          .build();
+    
+    ResponseDto<?> socketResponse;
+    try {
+      if (gameRoomService.checkAnswer(choiceDto)) {
+        socketResponse= ResponseDto.builder()
+            .status(ResponseStatus.SUCCESS)
+            .message("맞았습니다")
+            .data("단어 맞춤")
+            .build();
+      } else {
+        socketResponse =  ResponseDto.builder()
+          .status(ResponseStatus.SUCCESS)
+          .message("틀렸습니다")
+          .data("단어틀림")
+            .build();
+      }
       /*
         TODO
           결과를 어떤식으로 보내줘야 할지 
         webSocket.convertAndSend("/sub/game/result/" + userId, socketResponse);
       
       */
+
       return socketResponse;
     } catch (RuntimeException ex) {
-      ResponseDto<?> failResponse = ResponseDto.builder()
-      .status(ResponseStatus.FAILURE)
-      .message(ex.getMessage())
-      .build();
+      socketResponse =  ResponseDto.builder()
+        .status(ResponseStatus.FAILURE)
+        .message(ex.getMessage())
+        .build();
        /*
         TODO
           결과를 어떤식으로 보내줘야 할지 
         webSocket.convertAndSend("/sub/game/error/" + userId, failResponse);
       
       */
-      return failResponse;
+      return socketResponse;
     }
   }
 }

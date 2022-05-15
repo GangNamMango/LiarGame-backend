@@ -1,5 +1,6 @@
 package com.api.liargame.service;
 
+import com.api.liargame.controller.dto.request.ChoiceRequestDto;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
@@ -28,7 +29,10 @@ public interface GameRoomService {
 
   void gameCountdown(String roomId);
 
-  void isSame(String roomId, String word);
+  boolean isSame(GameRoom gameRoom, String word);
   
-  void isLiar(String roomId, String liarId);
+  void isLiar(GameRoom roomId, String liarId);
+
+  boolean checkAnswer(ChoiceRequestDto choiceRequestDto);
+
 }
