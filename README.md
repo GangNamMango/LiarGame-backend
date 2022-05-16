@@ -31,8 +31,11 @@
 
 ## link
 
-[프론트엔드팀의 자세한 개발 내용은?](https://github.com/GangNamMango/LiarGame-Frontend)
-[프로젝트 과정이 궁금하다면?](https://www.notion.so/7288a41786ed410899ab1ddbd4e80a75)
+>[프론트엔드팀의 자세한 개발 내용은?](https://github.com/GangNamMango/LiarGame-Frontend/blob/main/README.md)
+>
+>[백엔드팀의 자세한 개발내용은?](https://github.com/GangNamMango/LiarGame-backend/blob/main/HELP.md)
+>
+>[프로젝트 과정이 궁금하다면?](https://www.notion.so/7288a41786ed410899ab1ddbd4e80a75)
 
 ## pages
 
