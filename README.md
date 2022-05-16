@@ -2,7 +2,7 @@
 
 
 ## 🙊 프로젝트 소개
-<p align="center"><img src="https://user-images.githubusercontent.com/78775910/168639191-500bf5d5-3f7d-4103-84d5-1dc925de6886.png" width=50%></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/78775910/168639191-500bf5d5-3f7d-4103-84d5-1dc925de6886.png" width=20%></p>
 
 
 ### 라이어게임
