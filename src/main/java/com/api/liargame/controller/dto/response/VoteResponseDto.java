@@ -1,7 +1,7 @@
 package com.api.liargame.controller.dto.response;
 
+import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.GameStatus;
-import com.api.liargame.domain.User;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -26,15 +26,13 @@ public class VoteResponseDto {
     this.noteCompleted = noteCompleted;
   }
 
-  public static VoteResponseDto of(GameStatus gameStatus, List<User> users) {
-    int maxVoteCount = users.size();
-    int currentVoteCount = (int) users.stream()
-        .filter(User::isVote)
-        .count();
+  public static VoteResponseDto of(GameStatus gameStatus, GameRoom gameRoom) {
+    int maxVoteCount = gameRoom.getUsers().size();
+    int currentVoteCount = gameRoom.getVoteCompleteCount();
     List<String> completedUsers = new ArrayList<>();
     List<String> notCompletedUsers = new ArrayList<>();
 
-    users.forEach(u -> {
+    gameRoom.getUsers().forEach(u -> {
           if (u.isVote()) {
             completedUsers.add(u.getNickname());
           } else {

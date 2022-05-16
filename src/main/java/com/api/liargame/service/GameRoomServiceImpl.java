@@ -217,7 +217,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   @Override
-  public List<User> vote(String roomId, String userId, String voteTo) {
+  public GameRoom vote(String roomId, String userId, String voteTo) {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
     if (gameRoom == null) {
       throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
@@ -244,7 +244,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     //투표 처리
     gameRoom.vote(user, votedUser);
 
-    return new ArrayList<>(gameRoom.getUsers());
+    return gameRoom;
   }
 
 
@@ -269,6 +269,14 @@ public class GameRoomServiceImpl implements GameRoomService {
     return gameRoomWord.equals(liarWord);
   }
 
+  @Override
+  public boolean checkVoteComplete(String roomId) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+
+    return gameRoom.getVoteCompleteCount() == gameRoom.getUsers().size();
+  }
+
+  @Override
   public boolean checkAnswer(ChoiceRequestDto choiceRequestDto) {
     GameRoom gameRoom = gameRoomRepository.findById(choiceRequestDto.getRoomId());
     if (gameRoom == null)

@@ -201,9 +201,9 @@ public class GameRoomController {
     String voteTo = voteRequestDto.getVoteTo();
 
     try{
-      List<User> users = gameRoomService.vote(roomId, userId, voteTo);
+      GameRoom gameRoom = gameRoomService.vote(roomId, userId, voteTo);
 
-      VoteResponseDto voteResponseDto = VoteResponseDto.of(GameStatus.VOTE, users);
+      VoteResponseDto voteResponseDto = VoteResponseDto.of(GameStatus.VOTE, gameRoom);
 
       ResponseDto<?> socketResponse = ResponseDto.builder()
           .status(ResponseStatus.SUCCESS)
@@ -211,10 +211,15 @@ public class GameRoomController {
           .data(voteResponseDto)
           .build();
 
-      //TODO :: 투표 종료되었는지 확인 후 결과 보내는 메소드 필요
-
-
       webSocket.convertAndSend("/sub/game/vote/" + roomId, socketResponse);
+
+      if (gameRoomService.checkVoteComplete(roomId)) {
+        //TODO ::
+        //게임 결과를 계산하는 함수를 호출한다.
+        //그곳에서 dto를 받아 result로 send해준다.
+
+      }
+
       return socketResponse;
     } catch (RuntimeException ex) {
       ResponseDto<?> failResponse = ResponseDto.builder()
