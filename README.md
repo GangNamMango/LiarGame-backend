@@ -25,17 +25,17 @@
 ## 🛠 Tool
 <img src="https://img.shields.io/badge/Springboot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white"> <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white">
 
-## Schedule
-📆  22.03.18 ~ 22.05
+## 📆 Schedule
+22.03.18 ~ 22.05
 
 <br/>
 
-### Notion
+## Notion
 
 [프로젝트 상세정보 노션](https://www.notion.so/7288a41786ed410899ab1ddbd4e80a75)
 
 <br/>
 
-### pages
+## pages
 
 
