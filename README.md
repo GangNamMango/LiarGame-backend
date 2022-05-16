@@ -11,13 +11,8 @@
 >
 >참여자는 라이어에게 제시어를 들키지 않게 설명하고, 라이어는 제시어 카드를 맞춰야 하는 모바일 뷰 기반 게임 웹사이트입니다.
 
-📆  22.03.18 ~ 22.05
+
 <br/>
-
-### URL
-
-<br/><br/>
-
 
 
 ## 👩‍👦‍👦 Members
@@ -30,13 +25,16 @@
 ## 🛠 Tool
 <img src="https://img.shields.io/badge/Springboot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white"> <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white">
 
-<br/><br/>
+## Schedule
+📆  22.03.18 ~ 22.05
+
+<br/>
 
 ### Notion
 
 [프로젝트 상세정보 노션](https://www.notion.so/7288a41786ed410899ab1ddbd4e80a75)
 
-<br/><br/>
+<br/>
 
 ### pages
 
