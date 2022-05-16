@@ -10,16 +10,16 @@
 >
 >참여자는 라이어에게 제시어를 들키지 않게 설명하고, 라이어는 제시어 카드를 맞춰야 하는 모바일 뷰 기반 게임 웹사이트입니다.
 
-<br/><br/><br/>
+<br/><br/>
 
 ### 배포 URL
 
-<br/><br/><br/>
+<br/><br/>
 
 ### 기간
 📆  22.03.18 ~ 22.05
 
-<br/><br/><br/>
+<br/><br/>
 
 ### 팀원
 |  📝 planner  |  💻 front-end  |  💻 front-end  |  ⚙ back-end  |  ⚙ back-end  |
@@ -27,18 +27,18 @@
 |  <img src="https://user-images.githubusercontent.com/78775910/168641817-4ee048df-f981-4384-840a-3f2b7fc72611.jpg" width=100>  |  <img src="https://user-images.githubusercontent.com/78775910/168642734-0759320f-e8db-4e3d-a406-206f46646cba.png" width=100> |  <img src="https://user-images.githubusercontent.com/78775910/168642726-08dd7045-3728-4317-b968-ffe3b23506e9.jpg" width=100>  |  <img src="https://user-images.githubusercontent.com/78775910/168642707-7bbfa0b9-9ed5-446c-abc4-d6f93a85e276.png" width=100>  |  <img src="https://user-images.githubusercontent.com/78775910/168642718-ef68a273-8c69-4909-9e11-2ed1d0008c61.png" width=100>  |
 |  [곽새롬 👩‍💼](https://github.com/romzzi)  |  [이승원 👨‍🏫](https://github.com/SeungWon0921)  |  [이선아 👩‍🏫](https://github.com/ssun-aa)  |  [박종혁](https://github.com/jjonyo)  |  [김재찬](https://github.com/kjc6735)  |
 
-<br/><br/><br/>
+<br/><br/>
 
 ### Tool
 <img src="https://img.shields.io/badge/Springboot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white"> <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white">
 
-<br/><br/><br/>
+<br/><br/>
 
 ### Notion
 
 [프로젝트 상세정보 노션](https://www.notion.so/7288a41786ed410899ab1ddbd4e80a75)
 
-<br/><br/><br/>
+<br/><br/>
 
 ### page
 
