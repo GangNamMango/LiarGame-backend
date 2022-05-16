@@ -25,12 +25,14 @@
 ## 🛠 Tool
 <img src="https://img.shields.io/badge/Springboot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white"> <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white">
 
+
 ## 📆 Schedule
 22.03.18 ~ 22.05
 
-## Notion
+## link
 
-[프로젝트 노션](https://www.notion.so/7288a41786ed410899ab1ddbd4e80a75)
+[프론트엔드팀의 자세한 개발 내용은?](https://github.com/GangNamMango/LiarGame-Frontend)
+[프로젝트 과정이 궁금하다면?](https://www.notion.so/7288a41786ed410899ab1ddbd4e80a75)
 
 ## pages
 
