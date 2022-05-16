@@ -1,8 +1,7 @@
-라이어게임 로고 넣기
+![게임명](https://user-images.githubusercontent.com/78775910/168639154-042ca697-daa8-473e-80ea-d7081a76f975.png)
 
 ## 🙊 프로젝트 소개
-
-동그란 로고 이미지 넣기
+![로고 겨냥](https://user-images.githubusercontent.com/78775910/168639191-500bf5d5-3f7d-4103-84d5-1dc925de6886.png)
 
 ### 라이어게임
 >**`라이어게임`** 은 **`거짓말쟁이를 찾는`** 게임입니다.
