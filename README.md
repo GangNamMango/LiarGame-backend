@@ -1,5 +1,5 @@
 <div align="center">
-<p align="center"><img src="https://user-images.githubusercontent.com/78775910/168639154-042ca697-daa8-473e-80ea-d7081a76f975.png" width=50%></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/78775910/168639154-042ca697-daa8-473e-80ea-d7081a76f975.png" width=70%></p>
 📆  22.03.18 ~ 22.05
 </div>
 
@@ -17,6 +17,8 @@
 
 <br/><br/>
 
+<div align="center">
+
 ### 팀원
 |  📝 planner  |  💻 front-end  |  💻 front-end  |  ⚙ back-end  |  ⚙ back-end  |
 | :------------: | :------------: | :------------: | :------------: | :------------: |
@@ -26,7 +28,7 @@
 
 ### 사용 툴
 <img src="https://img.shields.io/badge/Springboot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white"> <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white">
-
+</div> 
 <br/><br/>
 
 ### Notion
