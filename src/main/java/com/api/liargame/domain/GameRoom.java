@@ -93,5 +93,12 @@ public class GameRoom {
     voteTo.addVoteCount();
   }
 
+  public User getLiar() {
+    return this.users.stream()
+        .filter(User::isLiar)
+        .findFirst()
+        .orElse(null);
+  }
+
 
 }

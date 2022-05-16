@@ -1,10 +1,10 @@
 package com.api.liargame.service;
 
-import com.api.liargame.controller.dto.request.ChoiceRequestDto;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.controller.dto.response.CounterResponseDto;
+import com.api.liargame.controller.dto.response.GameResultResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto.ResponseStatus;
 import com.api.liargame.domain.GameRoom;
@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -258,10 +259,11 @@ public class GameRoomServiceImpl implements GameRoomService {
         });
   }
 
-  private void isLiar(GameRoom gameRoom,String liarId) {
+  private void isLiar(GameRoom gameRoom, String liarId) {
     User realLiar = gameRoom.getInfo().getLiar();
-    if (!realLiar.getId().equals(liarId))
+    if (!realLiar.getId().equals(liarId)) {
       throw new IllegalStateException("당신은 라이어가 아닙니다.");
+    }
   }
 
   private boolean isSame(GameRoom gameRoom, String liarWord) {
@@ -277,15 +279,86 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   @Override
-  public boolean checkAnswer(ChoiceRequestDto choiceRequestDto) {
-    GameRoom gameRoom = gameRoomRepository.findById(choiceRequestDto.getRoomId());
-    if (gameRoom == null)
+  public boolean checkAnswer(String roomId, String userId, String choice) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    if (gameRoom == null) {
       throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
+    }
 
-    String liar = choiceRequestDto.getUserId();
-    String requestedWord = choiceRequestDto.getChoice();
+    isLiar(gameRoom, userId);
+    return isSame(gameRoom, choice);
+  }
 
-    isLiar(gameRoom, liar);
-    return isSame(gameRoom, requestedWord);
+  @Override
+  public GameResultResponseDto getGameResult(String roomId, String userId, String choice) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    User liar = gameRoom.getLiar();
+
+    if (liar == null) {
+      throw new IllegalStateException("현재 게임에 라이어가 존재하지 않습니다.");
+    }
+
+    switch (gameRoom.getGameStatus()) {
+      case VOTE:
+        return getVoteWinner(gameRoom, liar);
+      case CHOICE:
+        return getChoiceWinner(gameRoom, userId, choice, liar);
+      default:
+        throw new IllegalStateException("게임 결과는 VOTE나 CHOICE상태에만 확인할 수 있습니다.");
+    }
+  }
+
+  private GameResultResponseDto getChoiceWinner(GameRoom gameRoom, String userId, String choice, User liar) {
+    //라이어의 승리
+    if (checkAnswer(gameRoom.getRoomId(), userId, choice)) {
+      gameRoom.setGameStatus(GameStatus.END);
+      return GameResultResponseDto.ofLiarWin(
+          GameStatus.END,
+          GameRole.LIAR,
+          liar.getNickname(),
+          choice
+      );
+    } else {
+      //멤버들의 승리
+      gameRoom.setGameStatus(GameStatus.END);
+      return GameResultResponseDto.ofMemberWin(
+          GameStatus.END,
+          GameRole.MEMBER,
+          liar.getNickname(),
+          choice,
+          gameRoom.getInfo().getWord()
+      );
+    }
+  }
+
+  private GameResultResponseDto getVoteWinner(GameRoom gameRoom, User liar) {
+    //최대 득표수 계산
+    List<User> users = new ArrayList<>(gameRoom.getUsers());
+    users.sort((o1, o2) -> o2.getVoteCount() - o1.getVoteCount());
+    int maxVoteCount = users.get(0).getVoteCount();
+
+    //가장 많이 투표받은 유저 가져오기.
+    List<User> votedUsers = users.stream()
+        .filter(u -> u.getVoteCount() >= maxVoteCount)
+        .collect(Collectors.toList());
+
+    //votedUsers 중에 라이어가 있으면 CHOICE 상태로 넘어가야 한다.
+    if (votedUsers.stream().anyMatch(User::isLiar)) {
+      gameRoom.setGameStatus(GameStatus.CHOICE);
+      return GameResultResponseDto.ofLiarChoice(
+          GameStatus.CHOICE,
+          liar.getNickname(),
+          liar.getVoteCount()
+      );
+    } else {
+      //votedUsers중에 라이어가 없으면 라이어의 승리로 끝난다.
+      gameRoom.setGameStatus(GameStatus.END);
+      return GameResultResponseDto.ofLiarWin(
+          GameStatus.END,
+          GameRole.LIAR,
+          liar.getNickname(),
+          gameRoom.getInfo().getWord()
+      );
+    }
   }
 }

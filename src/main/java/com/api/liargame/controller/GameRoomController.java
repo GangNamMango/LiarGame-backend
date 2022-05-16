@@ -10,6 +10,7 @@ import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.controller.dto.request.VoteRequestDto;
 import com.api.liargame.controller.dto.response.CreateResponseDto;
 import com.api.liargame.controller.dto.response.EnterResponseDto;
+import com.api.liargame.controller.dto.response.GameResultResponseDto;
 import com.api.liargame.controller.dto.response.GameRoomResponseDto;
 import com.api.liargame.controller.dto.response.InfoResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto;
@@ -96,8 +97,9 @@ public class GameRoomController {
     User leavedUser = gameRoomService.leave(roomId, userId);
     GameRoom gameRoom = gameRoomService.find(roomId);
 
-    if (gameRoom == null)
+    if (gameRoom == null) {
       return new ResponseDto<>(ResponseStatus.FAILURE, "방이 존재하지 않습니다", null);
+    }
 
     GameRoomResponseDto gameRoomResponse = new GameRoomResponseDto(gameRoom);
 
@@ -127,7 +129,7 @@ public class GameRoomController {
 
       webSocket.convertAndSend("/sub/game/setting/" + gameRoom.getRoomId(), socketResponse);
       return socketResponse;
-    } catch(RuntimeException ex) {
+    } catch (RuntimeException ex) {
       ResponseDto<?> failResponse = ResponseDto.builder()
           .status(ResponseStatus.FAILURE)
           .message(ex.getMessage())
@@ -160,7 +162,8 @@ public class GameRoomController {
           .message(ex.getMessage())
           .build();
 
-      webSocket.convertAndSend("/sub/game/error/" + updateProfileRequestDto.getUserId(), failResponse);
+      webSocket.convertAndSend("/sub/game/error/" + updateProfileRequestDto.getUserId(),
+          failResponse);
       return failResponse;
     }
   }
@@ -200,7 +203,7 @@ public class GameRoomController {
     String userId = voteRequestDto.getUserId();
     String voteTo = voteRequestDto.getVoteTo();
 
-    try{
+    try {
       GameRoom gameRoom = gameRoomService.vote(roomId, userId, voteTo);
 
       VoteResponseDto voteResponseDto = VoteResponseDto.of(GameStatus.VOTE, gameRoom);
@@ -213,11 +216,17 @@ public class GameRoomController {
 
       webSocket.convertAndSend("/sub/game/vote/" + roomId, socketResponse);
 
+      //모든 유저의 투표가 완료되었으면 게임 결과를 반환한다.
       if (gameRoomService.checkVoteComplete(roomId)) {
-        //TODO ::
-        //게임 결과를 계산하는 함수를 호출한다.
-        //그곳에서 dto를 받아 result로 send해준다.
+        GameResultResponseDto gameResultDto = gameRoomService.getGameResult(roomId, userId, null);
+        ResponseDto<?> gameResultResponse = ResponseDto.builder()
+            .status(ResponseStatus.SUCCESS)
+            .message("모든 유저의 투표 완료")
+            .data(gameResultDto)
+            .build();
 
+        webSocket.convertAndSend("/sub/game/result/" + roomId, gameResultResponse);
+        return gameResultResponse;
       }
 
       return socketResponse;
@@ -232,44 +241,30 @@ public class GameRoomController {
     }
   }
 
-  @MessageMapping("/pub/game/choice")
+  @MessageMapping("/choice")
   public ResponseDto<?> choice(ChoiceRequestDto choiceDto) {
+    String roomId = choiceDto.getRoomId();
+    String userId = choiceDto.getUserId();
 
-    ResponseDto<?> socketResponse;
     try {
-      if (gameRoomService.checkAnswer(choiceDto)) {
-        socketResponse= ResponseDto.builder()
-            .status(ResponseStatus.SUCCESS)
-            .message("맞았습니다")
-            .data("단어 맞춤")
-            .build();
-      } else {
-        socketResponse =  ResponseDto.builder()
+      GameResultResponseDto gameResultDto = gameRoomService.getGameResult(roomId, userId, choiceDto.getChoice());
+
+      ResponseDto<?> socketResponse = ResponseDto.builder()
           .status(ResponseStatus.SUCCESS)
-          .message("틀렸습니다")
-          .data("단어틀림")
-            .build();
-      }
-      /*
-        TODO
-          결과를 어떤식으로 보내줘야 할지
-        webSocket.convertAndSend("/sub/game/result/" + userId, socketResponse);
+          .message("게임 결과")
+          .data(gameResultDto)
+          .build();
 
-      */
-
+      webSocket.convertAndSend("/sub/game/result/" + roomId, socketResponse);
       return socketResponse;
     } catch (RuntimeException ex) {
-      socketResponse =  ResponseDto.builder()
-        .status(ResponseStatus.FAILURE)
-        .message(ex.getMessage())
-        .build();
-       /*
-        TODO
-          결과를 어떤식으로 보내줘야 할지
-        webSocket.convertAndSend("/sub/game/error/" + userId, failResponse);
+      ResponseDto<?> failResponse = ResponseDto.builder()
+          .status(ResponseStatus.FAILURE)
+          .message(ex.getMessage())
+          .build();
 
-      */
-      return socketResponse;
+      webSocket.convertAndSend("/sub/game/error/" + userId, failResponse);
+      return failResponse;
     }
   }
 }
