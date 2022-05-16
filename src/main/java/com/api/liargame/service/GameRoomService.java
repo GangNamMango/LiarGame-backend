@@ -1,5 +1,6 @@
 package com.api.liargame.service;
 
+import com.api.liargame.controller.dto.request.ChoiceRequestDto;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
@@ -29,4 +30,6 @@ public interface GameRoomService {
   void gameCountdown(String roomId, String event);
 
   List<User> vote(String roomId, String userId, String voteTo);
+
+  boolean checkAnswer(ChoiceRequestDto choiceRequestDto);
 }

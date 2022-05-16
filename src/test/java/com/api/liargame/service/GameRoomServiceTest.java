@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.api.liargame.constants.SettingConstant;
+import com.api.liargame.controller.dto.request.ChoiceRequestDto;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
@@ -16,6 +17,8 @@ import com.api.liargame.exception.DuplicateUserNicknameException;
 import com.api.liargame.exception.NotFoundGameRoomException;
 import com.api.liargame.repository.GameRoomRepository;
 import com.api.liargame.repository.UserRepository;
+import com.api.liargame.repository.WordRepository;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,9 @@ class GameRoomServiceTest {
   GameRoomRepository gameRoomRepository;
   @Autowired
   UserRepository userRepository;
+
+  @Autowired
+  WordRepository wordRepository;
 
   GameRoom createRoom() {
     User user = User.builder()
@@ -253,6 +259,80 @@ class GameRoomServiceTest {
     userRepository.save(guest);
     gameRoom.addUser(guest);
 
-    assertThrows(IllegalStateException.class,() -> gameRoomService.createGameInfo(roomId, guest.getId()));
+    assertThrows(IllegalStateException.class, () -> gameRoomService.createGameInfo(roomId, guest.getId()));
+  }
+
+
+  @Test
+  @DisplayName("해당 방의 라이어가 아니면 에러가 나야한다.")
+  void fail_when_not_liar() {
+    String roomId = "test-room-id";
+    String userId = "test";
+
+    User host = new User(userId, Role.HOST, "ch0");
+    GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
+    userRepository.save(host);
+    gameRoomRepository.save(gameRoom);
+
+    User guest = new User("test-2", Role.GUEST, "ch0");
+    userRepository.save(guest);
+    gameRoom.addUser(guest);
+
+    User liar = new User("liar", Role.GUEST, "ch0");
+    userRepository.save(liar);
+    gameRoom.addUser(liar);
+
+    String topic = gameRoom.getSetting().getTopic();
+    String word = wordRepository.findWordByTopic(topic);
+    Info info = Info.create(liar, topic, word);
+
+    gameRoom.setInfo(info);
+
+    assertThrows(IllegalStateException.class, () -> gameRoomService.checkAnswer(new ChoiceRequestDto(host.getId(), roomId, word)));
+  }
+
+  @Test
+  @DisplayName("라이어야한다.")
+  void is_liar() {
+    String roomId = "test-room-id";
+    String userId = "test";
+
+    User host = new User(userId, Role.HOST, "ch0");
+    GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
+    userRepository.save(host);
+    gameRoomRepository.save(gameRoom);
+
+    User guest = new User("test-2", Role.GUEST, "ch0");
+    userRepository.save(guest);
+    gameRoom.addUser(guest);
+
+    String topic = gameRoom.getSetting().getTopic();
+    String word = "word";
+    Info info = Info.create(guest, topic, word);
+
+    gameRoom.setInfo(info);
+//    gameRoomService.isLiar(gameRoom, guest.getId());
+  }
+
+  @Test
+  @DisplayName("해당 방의 제시어와 같아야한다.")
+  void compare_word() {
+    String roomId = "test-room-id";
+    String userId = "test";
+    String gameRoomWord = "word";
+    String sameWord = "word";
+    String anotherWord = "word2";
+    User host = new User(userId, Role.HOST, "ch0");
+    GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
+    userRepository.save(host);
+    gameRoomRepository.save(gameRoom);
+
+    String topic = gameRoom.getSetting().getTopic();
+    Info info = Info.create(host, topic, gameRoomWord);
+
+    gameRoom.setInfo(info);
+//    assertThat(gameRoomService.isSame(gameRoom, sameWord)).isEqualTo(true);
+//    assertThat(gameRoomService.isSame(gameRoom, anotherWord)).isEqualTo(false);
   }
 }
+

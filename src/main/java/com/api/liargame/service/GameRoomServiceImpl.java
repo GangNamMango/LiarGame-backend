@@ -1,5 +1,6 @@
 package com.api.liargame.service;
 
+import com.api.liargame.controller.dto.request.ChoiceRequestDto;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
@@ -178,6 +179,11 @@ public class GameRoomServiceImpl implements GameRoomService {
     return roomId;
   }
 
+  /*
+    컨트롤러의 역할같은 느낌이라 프록시를 써서 Run부분을 떄어내서
+    컨트롤러에서 run 부분만 보이게 하는 방식으로 구현하는게 좋아 보입니다.
+    프록시 패턴..?
+  */
   @Override
   public void gameCountdown(String roomId, String event) {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
@@ -250,5 +256,28 @@ public class GameRoomServiceImpl implements GameRoomService {
         .orElseThrow(() -> {
           throw new IllegalArgumentException("게임 방에 존재하지 않는 유저입니다.");
         });
+  }
+
+  private void isLiar(GameRoom gameRoom,String liarId) {
+    User realLiar = gameRoom.getInfo().getLiar();
+    if (!realLiar.getId().equals(liarId))
+      throw new IllegalStateException("당신은 라이어가 아닙니다.");
+  }
+
+  private boolean isSame(GameRoom gameRoom, String liarWord) {
+    String gameRoomWord = gameRoom.getInfo().getWord();
+    return gameRoomWord.equals(liarWord);
+  }
+
+  public boolean checkAnswer(ChoiceRequestDto choiceRequestDto) {
+    GameRoom gameRoom = gameRoomRepository.findById(choiceRequestDto.getRoomId());
+    if (gameRoom == null)
+      throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
+
+    String liar = choiceRequestDto.getUserId();
+    String requestedWord = choiceRequestDto.getChoice();
+
+    isLiar(gameRoom, liar);
+    return isSame(gameRoom, requestedWord);
   }
 }

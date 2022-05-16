@@ -1,5 +1,6 @@
 package com.api.liargame.controller;
 
+import com.api.liargame.controller.dto.request.ChoiceRequestDto;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.GameStartRequestDto;
 import com.api.liargame.controller.dto.request.LeaveRequestDto;
@@ -221,4 +222,44 @@ public class GameRoomController {
     }
   }
 
+  @MessageMapping("/pub/game/choice")
+  public ResponseDto<?> choice(ChoiceRequestDto choiceDto) {
+
+    ResponseDto<?> socketResponse;
+    try {
+      if (gameRoomService.checkAnswer(choiceDto)) {
+        socketResponse= ResponseDto.builder()
+            .status(ResponseStatus.SUCCESS)
+            .message("맞았습니다")
+            .data("단어 맞춤")
+            .build();
+      } else {
+        socketResponse =  ResponseDto.builder()
+          .status(ResponseStatus.SUCCESS)
+          .message("틀렸습니다")
+          .data("단어틀림")
+            .build();
+      }
+      /*
+        TODO
+          결과를 어떤식으로 보내줘야 할지
+        webSocket.convertAndSend("/sub/game/result/" + userId, socketResponse);
+
+      */
+
+      return socketResponse;
+    } catch (RuntimeException ex) {
+      socketResponse =  ResponseDto.builder()
+        .status(ResponseStatus.FAILURE)
+        .message(ex.getMessage())
+        .build();
+       /*
+        TODO
+          결과를 어떤식으로 보내줘야 할지
+        webSocket.convertAndSend("/sub/game/error/" + userId, failResponse);
+
+      */
+      return socketResponse;
+    }
+  }
 }
