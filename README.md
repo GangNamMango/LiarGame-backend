@@ -1,7 +1,7 @@
 <div align="center">
 <p align="center"><img src="https://user-images.githubusercontent.com/78775910/168639154-042ca697-daa8-473e-80ea-d7081a76f975.png" width=50%></p>
 📆  22.03.18 ~ 22.05
-</
+</div>
 
 ## 프로젝트 소개
 
