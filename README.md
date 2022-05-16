@@ -28,13 +28,9 @@
 ## 📆 Schedule
 22.03.18 ~ 22.05
 
-<br/>
-
 ## Notion
 
-[프로젝트 상세정보 노션](https://www.notion.so/7288a41786ed410899ab1ddbd4e80a75)
-
-<br/>
+[프로젝트 노션](https://www.notion.so/7288a41786ed410899ab1ddbd4e80a75)
 
 ## pages
 
