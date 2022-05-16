@@ -19,7 +19,7 @@
 |  planner  |  front-end  |  front-end  |  back-end  |  back-end  |
 | :------------: | :------------: | :------------: | :------------: | :------------: |
 |  ![이미지를 넣으면 좋지않을지]  |  ![]  |  ![]  |  ![]  |  ![]  |
-|  [곽새롬 👩‍💼](https://github.com/romzzi)  |  [이승원 👨‍🏫](https://github.com/SeungWon0921)  |  [이선아 👩‍🏫](https://github.com/ssun-aa)  |  [박종혁 👨‍💻](https://github.com/jjonyo)  |  `S037` [김재찬 👨‍💻](https://github.com/kjc6735)  |
+|  [곽새롬 👩‍💼](https://github.com/romzzi)  |  [이승원 👨‍🏫](https://github.com/SeungWon0921)  |  [이선아 👩‍🏫](https://github.com/ssun-aa)  |  [박종혁 👨‍💻](https://github.com/jjonyo)  |  [김재찬 👨‍💻](https://github.com/kjc6735)  |
 
 ### Tool
 <img src="https://img.shields.io/badge/Springboot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white">
@@ -34,4 +34,3 @@
 
 
 
-![Footer](https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=footer)
