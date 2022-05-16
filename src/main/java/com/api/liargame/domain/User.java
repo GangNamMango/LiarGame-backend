@@ -77,4 +77,8 @@ public class User {
   public void addVoteCount() {
     this.voteCount += 1;
   }
+
+  public boolean isLiar() {
+    return this.gameRole.equals(GameRole.LIAR);
+  }
 }
