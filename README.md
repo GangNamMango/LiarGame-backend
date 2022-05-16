@@ -1,4 +1,5 @@
 ![게임명](https://user-images.githubusercontent.com/78775910/168639154-042ca697-daa8-473e-80ea-d7081a76f975.png)
+<img src="https://user-images.githubusercontent.com/51365114/119627750-716f3100-be47-11eb-8e83-686b23c2c161.png  width="200" height="400"/>
 
 ## 🙊 프로젝트 소개
 ![로고 겨냥](https://user-images.githubusercontent.com/78775910/168639191-500bf5d5-3f7d-4103-84d5-1dc925de6886.png)
@@ -12,7 +13,7 @@
 
 
 ### 기간
-- 22.03.18 ~ 22.05
+📆  22.03.18 ~ 22.05
 
 ### 팀원
 |  planner  |  front-end  |  front-end  |  back-end  |  back-end  |
