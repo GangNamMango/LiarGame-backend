@@ -21,7 +21,7 @@
 ### 팀원
 |  planner  |  front-end  |  front-end  |  back-end  |  back-end  |
 | :------------: | :------------: | :------------: | :------------: | :------------: |
-|  ![KakaoTalk_20220517_012952947](https://user-images.githubusercontent.com/78775910/168641817-4ee048df-f981-4384-840a-3f2b7fc72611.jpg)  |  ![]  |  ![]  |  ![]  |  ![]  |
+|  <img src="https://user-images.githubusercontent.com/78775910/168641817-4ee048df-f981-4384-840a-3f2b7fc72611.jpg" width=200>  |  ![]  |  ![]  |  ![]  |  ![]  |
 |  [곽새롬 👩‍💼](https://github.com/romzzi)  |  [이승원 👨‍🏫](https://github.com/SeungWon0921)  |  [이선아 👩‍🏫](https://github.com/ssun-aa)  |  [박종혁 👨‍💻](https://github.com/jjonyo)  |  [김재찬 👨‍💻](https://github.com/kjc6735)  |
 
 ### Tool
