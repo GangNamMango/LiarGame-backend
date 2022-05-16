@@ -1,6 +1,6 @@
 <div align="center">
 <p align="center"><img src="https://user-images.githubusercontent.com/78775910/168639154-042ca697-daa8-473e-80ea-d7081a76f975.png" width=70%></p>
-📆  22.03.18 ~ 22.05
+
 </div>
 
 ## 프로젝트 소개
@@ -11,6 +11,7 @@
 >
 >참여자는 라이어에게 제시어를 들키지 않게 설명하고, 라이어는 제시어 카드를 맞춰야 하는 모바일 뷰 기반 게임 웹사이트입니다.
 
+📆  22.03.18 ~ 22.05
 <br/>
 
 ### URL
@@ -26,7 +27,7 @@
 |  [곽새롬 👩‍💼](https://github.com/romzzi)  |  [이승원 👨‍🏫](https://github.com/SeungWon0921)  |  [이선아 👩‍🏫](https://github.com/ssun-aa)  |  [박종혁](https://github.com/jjonyo)  |  [김재찬](https://github.com/kjc6735)  |
 <br/>
 
-## Tool
+## 🛠 Tool
 <img src="https://img.shields.io/badge/Springboot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white"> <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white">
 
 <br/><br/>
