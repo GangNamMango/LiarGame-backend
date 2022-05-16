@@ -15,7 +15,9 @@ import com.api.liargame.controller.dto.response.InfoResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto;
 import com.api.liargame.controller.dto.response.ResponseDto.ResponseStatus;
 import com.api.liargame.controller.dto.response.UserResponseDto;
+import com.api.liargame.controller.dto.response.VoteResponseDto;
 import com.api.liargame.domain.GameRoom;
+import com.api.liargame.domain.GameStatus;
 import com.api.liargame.domain.Info;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
@@ -201,13 +203,16 @@ public class GameRoomController {
     try{
       List<User> users = gameRoomService.vote(roomId, userId, voteTo);
 
+      VoteResponseDto voteResponseDto = VoteResponseDto.of(GameStatus.VOTE, users);
+
       ResponseDto<?> socketResponse = ResponseDto.builder()
           .status(ResponseStatus.SUCCESS)
           .message("투표 완료")
-          .data(users)
+          .data(voteResponseDto)
           .build();
 
       //TODO :: 투표 종료되었는지 확인 후 결과 보내는 메소드 필요
+
 
       webSocket.convertAndSend("/sub/game/vote/" + roomId, socketResponse);
       return socketResponse;
