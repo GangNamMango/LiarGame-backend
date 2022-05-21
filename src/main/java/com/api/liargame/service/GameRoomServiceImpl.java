@@ -1,5 +1,7 @@
 package com.api.liargame.service;
 
+import com.api.liargame.constants.GameRoomConstant;
+import com.api.liargame.constants.SettingConstant;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
@@ -169,22 +171,15 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public String randomRoomId() {
-    int length = 5;
-    String str = "qwertyuiopasdfghjklzxcvbnm123456789";
+    Integer length = GameRoomConstant.ROOM_ID_LENGTH;
     String roomId = "";
     Random random = new Random();
     for (int i = 0; i < length; i++) {
-      roomId += str.charAt(random.nextInt(str.length()));
+      roomId += random.nextInt(10);
     }
-
     return roomId;
   }
 
-  /*
-    컨트롤러의 역할같은 느낌이라 프록시를 써서 Run부분을 떄어내서
-    컨트롤러에서 run 부분만 보이게 하는 방식으로 구현하는게 좋아 보입니다.
-    프록시 패턴..?
-  */
   @Override
   public void gameCountdown(String roomId, String event) {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
@@ -247,8 +242,6 @@ public class GameRoomServiceImpl implements GameRoomService {
 
     return gameRoom;
   }
-
-
   private User isExistUserInGame(String userId, GameRoom gameRoom) {
     return gameRoom.getUsers()
         .stream()

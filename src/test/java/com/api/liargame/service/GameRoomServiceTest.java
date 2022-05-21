@@ -2,7 +2,11 @@ package com.api.liargame.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.regex.Pattern;
+
+import com.api.liargame.constants.GameRoomConstant;
 import com.api.liargame.constants.SettingConstant;
 import com.api.liargame.controller.dto.request.ChoiceRequestDto;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
@@ -60,7 +64,7 @@ class GameRoomServiceTest {
 
     GameRoom room = gameRoomService.createRoom(userRequestDto);
 
-    assertThat(room.getRoomId().length()).isEqualTo(5);
+    assertThat(room.getRoomId().length()).isEqualTo(GameRoomConstant.ROOM_ID_LENGTH);
     assertThat(room.getHost().getNickname()).isEqualTo("user1");
     assertThat(room.getSetting().getTimeLimit()).isEqualTo(SettingConstant.DEFAULT_TIME_LIMIT);
     assertThat(room.getUsers().size()).isEqualTo(1);
@@ -331,8 +335,16 @@ class GameRoomServiceTest {
     Info info = Info.create(host, topic, gameRoomWord);
 
     gameRoom.setInfo(info);
-//    assertThat(gameRoomService.isSame(gameRoom, sameWord)).isEqualTo(true);
-//    assertThat(gameRoomService.isSame(gameRoom, anotherWord)).isEqualTo(false);
+    //    assertThat(gameRoomService.isSame(gameRoom, sameWord)).isEqualTo(true);
+    //    assertThat(gameRoomService.isSame(gameRoom, anotherWord)).isEqualTo(false);
+  }
+  
+  @Test
+  @DisplayName("방의 아이디는 숫자로만 이루어져 있어야 한다.")
+  void randomRoomIdTest() {
+    String reg = "^[0-9]{"+ GameRoomConstant.ROOM_ID_LENGTH + "}";
+    String roomId = gameRoomService.randomRoomId();
+    assertTrue(Pattern.matches(reg, roomId));
   }
 }
 
