@@ -282,38 +282,14 @@ class GameRoomServiceTest {
     userRepository.save(liar);
     gameRoom.addUser(liar);
 
-    String topic = gameRoom.getSetting().getTopic();
+    String topic = wordRepository.resetTopic(gameRoom.getSetting().getTopic());
     String word = wordRepository.findWordByTopic(topic);
     Info info = Info.create(liar, topic, word);
-
     gameRoom.setInfo(info);
 
-//    assertThrows(IllegalStateException.class, () -> gameRoomService.checkAnswer(new ChoiceRequestDto(host.getId(), roomId, word)));
+    assertThrows(IllegalStateException.class, () -> gameRoomService.checkAnswer(roomId, userId, word));
   }
-
-  @Test
-  @DisplayName("라이어야한다.")
-  void is_liar() {
-    String roomId = "test-room-id";
-    String userId = "test";
-
-    User host = new User(userId, Role.HOST, "ch0");
-    GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
-    userRepository.save(host);
-    gameRoomRepository.save(gameRoom);
-
-    User guest = new User("test-2", Role.GUEST, "ch0");
-    userRepository.save(guest);
-    gameRoom.addUser(guest);
-
-    String topic = gameRoom.getSetting().getTopic();
-    String word = "word";
-    Info info = Info.create(guest, topic, word);
-
-    gameRoom.setInfo(info);
-//    gameRoomService.isLiar(gameRoom, guest.getId());
-  }
-
+  
   @Test
   @DisplayName("해당 방의 제시어와 같아야한다.")
   void compare_word() {
@@ -331,8 +307,8 @@ class GameRoomServiceTest {
     Info info = Info.create(host, topic, gameRoomWord);
 
     gameRoom.setInfo(info);
-//    assertThat(gameRoomService.isSame(gameRoom, sameWord)).isEqualTo(true);
-//    assertThat(gameRoomService.isSame(gameRoom, anotherWord)).isEqualTo(false);
+    //    assertThat(gameRoomService.isSame(gameRoom, sameWord)).isEqualTo(true);
+    //    assertThat(gameRoomService.isSame(gameRoom, anotherWord)).isEqualTo(false);
   }
 }
 

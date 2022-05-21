@@ -6,12 +6,18 @@ import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class MemoryGameRoomRepositoryTest {
 
   GameRoomRepository gameRoomRepository = new MemoryGameRoomRepository();
+  @BeforeEach
+  void repository_clear() {
+    gameRoomRepository.clear();
+  }
 
   @Test
   @DisplayName("게임 방을 저장할 수 있어야 한다.")

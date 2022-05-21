@@ -135,7 +135,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
     gameRoom.validateHost(userId);
 
-    String topic = gameRoom.getSetting().getTopic();
+    String topic = wordRepository.resetTopic(gameRoom.getSetting().getTopic());
     String word = wordRepository.findWordByTopic(topic);
 
     User liar = getRandomLiar(gameRoom);

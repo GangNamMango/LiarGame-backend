@@ -15,7 +15,7 @@ public class MemoryWordRepository implements WordRepository {
   public static final String WORD_DB_PATH = "json/word.json";
   private final Map<String, List<String>> db;
 
-
+  
   public MemoryWordRepository() throws IOException {
     ClassLoader classLoader = getClass().getClassLoader();
     InputStream inputStream = classLoader.getResourceAsStream(WORD_DB_PATH);
@@ -26,10 +26,6 @@ public class MemoryWordRepository implements WordRepository {
 
   @Override
   public String findWordByTopic(String topic) {
-    if(topic.equals("랜덤")) {
-      return findWordByRandomTopic();
-    }
-
     if (!db.containsKey(topic))
       throw new IllegalStateException("존재하지 않는 주제입니다.");
 
@@ -41,11 +37,18 @@ public class MemoryWordRepository implements WordRepository {
     return words.get(randomIndex);
   }
 
+  @Override
+  public String resetTopic(String topic) {
+    if (topic.equals("랜덤"))
+      return findWordByRandomTopic();
+    return topic;
+  }
+
   private String findWordByRandomTopic() {
     List<String> topics = new ArrayList<>(db.keySet());
     int randomIndex = new Random().nextInt(db.keySet().size());
 
-    return findWordByTopic(topics.get(randomIndex));
+    return topics.get(randomIndex);
   }
 
   @Override
