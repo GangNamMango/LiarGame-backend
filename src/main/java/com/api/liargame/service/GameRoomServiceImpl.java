@@ -264,6 +264,8 @@ public class GameRoomServiceImpl implements GameRoomService {
     return gameRoomWord.equals(liarWord);
   }
 
+
+
   @Override
   public boolean checkVoteComplete(String roomId) {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
@@ -341,8 +343,7 @@ public class GameRoomServiceImpl implements GameRoomService {
       return GameResultResponseDto.ofLiarChoice(
           GameStatus.CHOICE,
           liar.getNickname(),
-          liar.getVoteCount()
-      );
+          liar.getVoteCount());
     } else {
       //votedUsers중에 라이어가 없으면 라이어의 승리로 끝난다.
       gameRoom.setGameStatus(GameStatus.END);
@@ -350,8 +351,17 @@ public class GameRoomServiceImpl implements GameRoomService {
           GameStatus.END,
           GameRole.LIAR,
           liar.getNickname(),
-          gameRoom.getInfo().getWord()
-      );
+          gameRoom.getInfo().getWord());
     }
+  }
+  @Override
+  public void checkMinUser(String roomId) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    if (gameRoom == null) {
+      throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
+    }
+    Integer totalMember = gameRoom.getUsers().size();
+    if (totalMember < GameRoomConstant.ROOM_MIN_USER)
+      throw new IllegalStateException("게임을 시작하기 위한 최소 인원은 " + GameRoomConstant.ROOM_ID_LENGTH + "명 입니다.");
   }
 }

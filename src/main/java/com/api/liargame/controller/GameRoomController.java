@@ -174,6 +174,16 @@ public class GameRoomController {
     String userId = gameStartRequestDto.getUserId();
 
     try {
+      // 게임 룸 찾기를 컨트롤러로 올리는게 좋을거 같다..
+      // GameRoom = gameRoomService.find(roomId);
+      //checkMinUser(GameRoom gameRoom);  //checkMinUser의 파라미터가 String roomId일 경우 방 찾는 로직이 겹친다.. 그렇다고 createGameInfo에 넣기에는 함수가 여러가지 역할을 하게된다..
+      //Info gameInfo = gameRoomService.createGameInfo(GameRoom gameRoom, userId);
+
+      //방 찾는것을 전부 컨트롤러로 올리고 찾은 게임룸을 내려주는게 더 좋은 방법같다.
+      //로직에 gameRoom = findById(roomId)
+      //if(gameRoom == null) throw new Exception; 이 로직이 반복되는걸 없애고, 서비스에서는 신뢰하고 gameRoom을 사용할 수 있다.
+      //GameRoom findRoomOrFail(roomId){}; 이런 함수 하나 만들면 좋을 거 같다.
+      gameRoomService.checkMinUser(roomId);
       Info gameInfo = gameRoomService.createGameInfo(roomId, userId);
       InfoResponseDto infoResponseDto = InfoResponseDto.of(gameInfo);
 
@@ -182,7 +192,6 @@ public class GameRoomController {
           .message("게임 시작")
           .data(infoResponseDto)
           .build();
-
       gameRoomService.gameCountdown(roomId, "/sub/game/countdown/" + roomId);
       webSocket.convertAndSend("/sub/game/start/" + roomId, socketResponse);
       return socketResponse;
@@ -228,7 +237,6 @@ public class GameRoomController {
         webSocket.convertAndSend("/sub/game/result/" + roomId, gameResultResponse);
         return gameResultResponse;
       }
-
       return socketResponse;
     } catch (RuntimeException ex) {
       ResponseDto<?> failResponse = ResponseDto.builder()

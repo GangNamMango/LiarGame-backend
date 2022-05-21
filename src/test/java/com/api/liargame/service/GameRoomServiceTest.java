@@ -25,6 +25,8 @@ import com.api.liargame.repository.WordRepository;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.matchers.GreaterThan;
+import org.mockito.internal.matchers.LessThan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -318,9 +320,39 @@ class GameRoomServiceTest {
   @Test
   @DisplayName("방의 아이디는 숫자로만 이루어져 있어야 한다.")
   void randomRoomIdTest() {
-    String reg = "^[0-9]{"+ GameRoomConstant.ROOM_ID_LENGTH + "}";
+    String reg = "^[0-9]{" + GameRoomConstant.ROOM_ID_LENGTH + "}";
     String roomId = gameRoomService.randomRoomId();
     assertTrue(Pattern.matches(reg, roomId));
+  }
+  
+
+  @Test
+  @DisplayName("방의 유저의 최소 인원수 미만이면 에러가 발생해야한다.")
+  void checkMinUserTest() {
+    String roomId = "test-room-id";
+    String userId = "test";
+
+    User host = new User(userId, Role.HOST, "ch0");
+    GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
+    userRepository.save(host);
+    gameRoomRepository.save(gameRoom);
+    assertThrows(IllegalStateException.class, () -> gameRoomService.checkMinUser(roomId));
+    
+    for (int i = 0; i < GameRoomConstant.ROOM_MIN_USER - 2; i++) {
+      String testId = "test-" + Integer.toString(i);
+      User guest = new User(testId, Role.GUEST, "ch0");
+      userRepository.save(guest);
+      gameRoom.addUser(guest);
+      assertThrows(IllegalStateException.class, () -> gameRoomService.checkMinUser(roomId));
+    }
+    assertTrue(GameRoomConstant.ROOM_MIN_USER > gameRoom.getUsers().size());
+    //정상 동작
+    User guest = new User("lastUser", Role.GUEST, "ch0");
+    userRepository.save(guest);
+    gameRoom.addUser(guest);
+    gameRoomService.checkMinUser(roomId);
+    
+    assertTrue(GameRoomConstant.ROOM_MIN_USER <= gameRoom.getUsers().size());
   }
 }
 
