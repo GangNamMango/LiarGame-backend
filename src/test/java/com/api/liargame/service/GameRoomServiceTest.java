@@ -13,6 +13,7 @@ import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
 import com.api.liargame.domain.GameRoom;
+import com.api.liargame.domain.GameStatus;
 import com.api.liargame.domain.Info;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
@@ -323,6 +324,23 @@ class GameRoomServiceTest {
     gameRoom.setInfo(info);
     //    assertThat(gameRoomService.isSame(gameRoom, sameWord)).isEqualTo(true);
     //    assertThat(gameRoomService.isSame(gameRoom, anotherWord)).isEqualTo(false);
+  }
+
+  @Test
+  @DisplayName("게임 시작 후 방에 입장할 수 없어야 한다.")
+  void enter_fail_when_game_start() {
+    String roomId = "test-room-id";
+    String userId = "test";
+    User host = new User(userId, Role.HOST, "ch0");
+    GameRoom gameRoom = new GameRoom(roomId, host, new Setting());
+    userRepository.save(host);
+    gameRoomRepository.save(gameRoom);
+
+    gameRoom.setGameStatus(GameStatus.PROGRESS);
+
+    assertThrows(IllegalStateException.class, () -> {
+      gameRoomService.enter(new EnterRequestDto(roomId, new UserRequestDto("user2", "ch1")));
+    });
   }
 
   @Test
