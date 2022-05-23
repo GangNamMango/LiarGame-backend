@@ -36,4 +36,5 @@ public interface GameRoomService {
 
   boolean checkAnswer(String roomId, String userId, String choice);
 
+  GameRoom getGameRoomOrFail(String roomId);
 }

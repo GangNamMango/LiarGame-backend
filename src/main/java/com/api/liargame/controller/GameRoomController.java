@@ -95,11 +95,7 @@ public class GameRoomController {
     String roomId = leaveRequestDto.getRoomId();
     String userId = leaveRequestDto.getUserId();
     User leavedUser = gameRoomService.leave(roomId, userId);
-    GameRoom gameRoom = gameRoomService.find(roomId);
-
-    if (gameRoom == null) {
-      return new ResponseDto<>(ResponseStatus.FAILURE, "방이 존재하지 않습니다", null);
-    }
+    GameRoom gameRoom = gameRoomService.getGameRoomOrFail(roomId);
 
     GameRoomResponseDto gameRoomResponse = new GameRoomResponseDto(gameRoom);
 
@@ -117,7 +113,7 @@ public class GameRoomController {
   @MessageMapping("/setting")
   public ResponseDto<?> updateSetting(@Payload SettingRequestDto settingRequestDto) {
     String roomId = settingRequestDto.getRoomId();
-    GameRoom gameRoom = gameRoomService.find(roomId);
+    GameRoom gameRoom = gameRoomService.getGameRoomOrFail(roomId);
     try {
       Setting updatedSetting = settingService.updateSetting(gameRoom, settingRequestDto);
 
