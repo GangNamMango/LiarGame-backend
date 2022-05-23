@@ -66,6 +66,11 @@ public class GameRoomServiceImpl implements GameRoomService {
       throw new NotFoundGameRoomException();
     }
 
+    GameStatus gameStatus = foundGameRoom.getGameStatus();
+    if (!gameStatus.equals(GameStatus.WAITING)) {
+      throw new IllegalStateException("게임이 시작한 이후에는 방에 입장할 수 없습니다. 현재 상태 : " + gameStatus);
+    }
+
     User user = enterRequestDto.getUser().toEntity();
     userRepository.save(user);
 
