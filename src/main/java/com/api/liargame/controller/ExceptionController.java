@@ -19,7 +19,9 @@ public class ExceptionController {
       NotFoundGameRoomException.class,
       DuplicateUserNicknameException.class,
       GameRoomCreateFailException.class,
-      SettingPermissionException.class
+      SettingPermissionException.class,
+      IllegalStateException.class,
+      IllegalArgumentException.class
   })
   public ResponseEntity<Object> RuntimeException(final RuntimeException ex) {
     ResponseDto<Object> response = ResponseDto.builder()
