@@ -1,6 +1,8 @@
 package com.api.liargame.controller.dto.response;
 
+import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.GameStatus;
+import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.GameRole;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -55,6 +57,17 @@ public class GameResultResponseDto {
         .gameStatus(gameStatus.name())
         .liarName(liarName)
         .voteCount(voteCount)
+        .build();
+  }
+
+  public static GameResultResponseDto ofGameExit(GameRoom gameRoom, User exitUser) {
+    String winner = exitUser.getGameRole().equals(GameRole.LIAR) ? "member" : "draw";
+
+    return GameResultResponseDto.builder()
+        .gameStatus(gameRoom.getGameStatus().name())
+        .winner(winner)
+        .liarName(gameRoom.getLiar().getNickname())
+        .word(gameRoom.getInfo().getWord())
         .build();
   }
 }

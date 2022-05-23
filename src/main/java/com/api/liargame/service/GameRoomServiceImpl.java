@@ -1,5 +1,8 @@
 package com.api.liargame.service;
 
+import static com.api.liargame.domain.User.GameRole.LIAR;
+import static com.api.liargame.domain.User.GameRole.MEMBER;
+
 import com.api.liargame.constants.GameRoomConstant;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
@@ -13,7 +16,6 @@ import com.api.liargame.domain.GameStatus;
 import com.api.liargame.domain.Info;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
-import com.api.liargame.domain.User.GameRole;
 import com.api.liargame.domain.User.Role;
 import com.api.liargame.exception.NotFoundGameRoomException;
 import com.api.liargame.repository.GameRoomRepository;
@@ -115,6 +117,24 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   @Override
+  public User exit(String roomId, String userId) {
+    GameRoom gameRoom = getGameRoomOrFail(roomId);
+    User user = isExistUserInGame(userId, gameRoom);
+
+    //TODO : 추후 3 -> GameRoomConstant로 바꾸기
+    if (user.getGameRole().equals(LIAR) || gameRoom.getUserCount() - 1 < GameRoomConstant.ROOM_MIN_USER) {
+      //게임종료 처리
+      gameRoom.setGameStatus(GameStatus.END);
+    }
+
+    gameRoom.deleteUser(user);
+    gameRoom.update();
+    userRepository.delete(user.getId());
+
+    return user;
+  }
+
+  @Override
   public User updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto) {
     GameRoom gameRoom = getGameRoomOrFail(updateProfileRequestDto.getRoomId());
 
@@ -139,7 +159,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     String word = wordRepository.findWordByTopic(topic);
 
     User liar = getRandomLiar(gameRoom);
-    liar.setGameRole(GameRole.LIAR);
+    liar.setGameRole(LIAR);
 
     Info gameInfo = Info.create(liar, topic, word);
     gameRoom.setInfo(gameInfo);
@@ -238,6 +258,11 @@ public class GameRoomServiceImpl implements GameRoomService {
     return gameRoom;
   }
   private User isExistUserInGame(String userId, GameRoom gameRoom) {
+    User user = userRepository.findById(userId);
+    if (user == null) {
+      throw new IllegalArgumentException("유저를 찾을 수 없습니다.");
+    }
+
     return gameRoom.getUsers()
         .stream()
         .filter(u -> u.getId().equals(userId))
@@ -301,7 +326,7 @@ public class GameRoomServiceImpl implements GameRoomService {
       processEndGame(gameRoom);
       return GameResultResponseDto.ofLiarWin(
           GameStatus.END,
-          GameRole.LIAR,
+          LIAR,
           liar.getNickname(),
           choice
       );
@@ -310,7 +335,7 @@ public class GameRoomServiceImpl implements GameRoomService {
       processEndGame(gameRoom);
       return GameResultResponseDto.ofMemberWin(
           GameStatus.END,
-          GameRole.MEMBER,
+          MEMBER,
           liar.getNickname(),
           choice,
           gameRoom.getInfo().getWord()
@@ -341,7 +366,7 @@ public class GameRoomServiceImpl implements GameRoomService {
       processEndGame(gameRoom);
       return GameResultResponseDto.ofLiarWin(
           GameStatus.END,
-          GameRole.LIAR,
+          LIAR,
           liar.getNickname(),
           gameRoom.getInfo().getWord());
     }
@@ -354,7 +379,8 @@ public class GameRoomServiceImpl implements GameRoomService {
           "게임을 시작하기 위한 최소 인원은 " + GameRoomConstant.ROOM_MIN_USER + "명 입니다.");
   }
 
-  private void processEndGame(GameRoom gameRoom) {
+  @Override
+  public void processEndGame(GameRoom gameRoom) {
     log.info("[✳️게임 종료] 게임이 종료되었습니다. (CODE : {})", gameRoom.getRoomId());
     gameRoom.setGameStatus(GameStatus.END);
 
@@ -366,6 +392,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     gameRoomRepository.delete(gameRoom.getRoomId());
   }
 
+  @Override
   public GameRoom getGameRoomOrFail(String roomId) {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
 

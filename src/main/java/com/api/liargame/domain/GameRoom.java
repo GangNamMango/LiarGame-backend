@@ -100,5 +100,7 @@ public class GameRoom {
         .orElse(null);
   }
 
-
+  public int getUserCount() {
+    return this.users.size();
+  }
 }

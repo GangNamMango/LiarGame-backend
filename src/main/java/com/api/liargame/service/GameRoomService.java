@@ -18,6 +18,8 @@ public interface GameRoomService {
 
   User leave(String roomId, String userId);
 
+  User exit(String roomId, String userId);
+
   User updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto);
 
   Info createGameInfo(String roomId, String userId);
@@ -35,6 +37,8 @@ public interface GameRoomService {
   GameResultResponseDto getGameResult(String roomId, String userId, String choice);
 
   boolean checkAnswer(String roomId, String userId, String choice);
+
+  void processEndGame(GameRoom gameRoom);
 
   GameRoom getGameRoomOrFail(String roomId);
 }

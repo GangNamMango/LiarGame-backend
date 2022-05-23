@@ -25,6 +25,7 @@ import com.api.liargame.domain.User;
 import com.api.liargame.service.GameRoomService;
 import com.api.liargame.service.SettingService;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -107,6 +108,44 @@ public class GameRoomController {
 
     webSocket.convertAndSend("/sub/game/leave/" + roomId, socketResponse);
 
+    return socketResponse;
+  }
+
+  @MessageMapping("/exit")
+  public ResponseDto<?> exit(@Payload LeaveRequestDto exitRequestDto) {
+    String roomId = exitRequestDto.getRoomId();
+    String userId = exitRequestDto.getUserId();
+
+    User exitUser = gameRoomService.exit(roomId, userId);
+    GameRoom gameRoom = gameRoomService.getGameRoomOrFail(roomId);
+
+    if (gameRoom.getGameStatus().equals(GameStatus.END)) {
+      gameRoomService.processEndGame(gameRoom);
+
+      GameResultResponseDto gameResultResponseDto = GameResultResponseDto.ofGameExit(gameRoom, exitUser);
+
+      ResponseDto<?> endResultResponse = ResponseDto.builder()
+          .status(ResponseStatus.SUCCESS)
+          .message("게임을 더 이상 진행할 수 없습니다.")
+          .data(gameResultResponseDto)
+          .build();
+
+      webSocket.convertAndSend("/sub/game/result/" + roomId, endResultResponse);
+      return endResultResponse;
+    }
+
+    List<UserResponseDto> userResponseList = gameRoom.getUsers()
+        .stream()
+        .map(UserResponseDto::new)
+        .collect(Collectors.toList());
+
+    ResponseDto<?> socketResponse = ResponseDto.<List<UserResponseDto>>builder()
+        .status(ResponseStatus.SUCCESS)
+        .message(exitUser.getNickname() + "님이 게임을 나갔습니다.")
+        .data(userResponseList)
+        .build();
+
+    webSocket.convertAndSend("/sub/game/exit/" + roomId, socketResponse);
     return socketResponse;
   }
 
@@ -241,7 +280,8 @@ public class GameRoomController {
     String userId = choiceDto.getUserId();
 
     try {
-      GameResultResponseDto gameResultDto = gameRoomService.getGameResult(roomId, userId, choiceDto.getChoice());
+      GameResultResponseDto gameResultDto = gameRoomService.getGameResult(roomId, userId,
+          choiceDto.getChoice());
 
       ResponseDto<?> socketResponse = ResponseDto.builder()
           .status(ResponseStatus.SUCCESS)
