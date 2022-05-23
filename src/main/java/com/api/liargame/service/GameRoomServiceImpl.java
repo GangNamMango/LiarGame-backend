@@ -1,7 +1,6 @@
 package com.api.liargame.service;
 
 import com.api.liargame.constants.GameRoomConstant;
-import com.api.liargame.constants.SettingConstant;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
@@ -28,11 +27,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GameRoomServiceImpl implements GameRoomService {
 
   private final GameRoomRepository gameRoomRepository;
@@ -312,7 +313,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   private GameResultResponseDto getChoiceWinner(GameRoom gameRoom, String userId, String choice, User liar) {
     //라이어의 승리
     if (checkAnswer(gameRoom.getRoomId(), userId, choice)) {
-      gameRoom.setGameStatus(GameStatus.END);
+      processEndGame(gameRoom);
       return GameResultResponseDto.ofLiarWin(
           GameStatus.END,
           GameRole.LIAR,
@@ -321,7 +322,7 @@ public class GameRoomServiceImpl implements GameRoomService {
       );
     } else {
       //멤버들의 승리
-      gameRoom.setGameStatus(GameStatus.END);
+      processEndGame(gameRoom);
       return GameResultResponseDto.ofMemberWin(
           GameStatus.END,
           GameRole.MEMBER,
@@ -352,7 +353,7 @@ public class GameRoomServiceImpl implements GameRoomService {
           liar.getVoteCount());
     } else {
       //votedUsers중에 라이어가 없으면 라이어의 승리로 끝난다.
-      gameRoom.setGameStatus(GameStatus.END);
+      processEndGame(gameRoom);
       return GameResultResponseDto.ofLiarWin(
           GameStatus.END,
           GameRole.LIAR,
@@ -364,6 +365,19 @@ public class GameRoomServiceImpl implements GameRoomService {
   private void checkMinUser(GameRoom gameRoom) {
     Integer totalMember = gameRoom.getUsers().size();
     if (totalMember < GameRoomConstant.ROOM_MIN_USER)
-      throw new IllegalStateException("게임을 시작하기 위한 최소 인원은 " + GameRoomConstant.ROOM_MIN_USER + "명 입니다.");
+      throw new IllegalStateException(
+          "게임을 시작하기 위한 최소 인원은 " + GameRoomConstant.ROOM_MIN_USER + "명 입니다.");
+  }
+
+  private void processEndGame(GameRoom gameRoom) {
+    log.info("[✳️게임 종료] 게임이 종료되었습니다. (CODE : {}", gameRoom.getRoomId());
+    gameRoom.setGameStatus(GameStatus.END);
+
+    //방에 속해있는 유저삭제
+    gameRoom.getUsers()
+        .forEach(u -> userRepository.delete(u.getId()));
+
+    //방 삭제
+    gameRoomRepository.delete(gameRoom.getRoomId());
   }
 }
