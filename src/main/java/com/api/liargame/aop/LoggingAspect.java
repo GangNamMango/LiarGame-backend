@@ -36,17 +36,17 @@ public class LoggingAspect {
     //모든 Controller에 적용
     @Around("execution(* com.api.liargame..*Controller.*(..))")
     public Object logging(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        // -- request -- 
+        // -- request --
         String requestId = UUID.randomUUID().toString();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(proceedingJoinPoint.getArgs()[0]);
-        log.info("\nrequest : "+ requestId +"\n" + json);
-        // -- request -- 
+        log.debug("\nrequest : "+ requestId +"\n" + json);
+        // -- request --
         Object result = proceedingJoinPoint.proceed();
-        
-        // -- response -- 
+
+        // -- response --
         String requestJson = gson.toJson(result);
-        log.info("\nresponse: "+ requestId +"\n" + requestJson);
+        log.debug("\nresponse: "+ requestId +"\n" + requestJson);
         return result;
     }
 }
