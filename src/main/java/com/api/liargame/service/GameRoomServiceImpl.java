@@ -62,10 +62,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Override
   public User enter(EnterRequestDto enterRequestDto) {
     String roomId = enterRequestDto.getRoomId();
-    GameRoom foundGameRoom = gameRoomRepository.findById(roomId);
-    if (foundGameRoom == null) {
-      throw new NotFoundGameRoomException();
-    }
+    GameRoom foundGameRoom = getGameRoomOrFail(roomId);
 
     GameStatus gameStatus = foundGameRoom.getGameStatus();
     if (!gameStatus.equals(GameStatus.WAITING)) {
@@ -88,7 +85,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public User leave(String roomId, String userId) {
-    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    GameRoom gameRoom = getGameRoomOrFail(roomId);
     User user = userRepository.findById(userId);
 
     if (user == null) {
@@ -119,10 +116,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public User updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto) {
-    GameRoom gameRoom = gameRoomRepository.findById(updateProfileRequestDto.getRoomId());
-    if (gameRoom == null) {
-      throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
-    }
+    GameRoom gameRoom = getGameRoomOrFail(updateProfileRequestDto.getRoomId());
 
     User user = isExistUserInGame(updateProfileRequestDto.getUserId(), gameRoom);
 
@@ -136,10 +130,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public Info createGameInfo(String roomId, String userId) {
-    GameRoom gameRoom = gameRoomRepository.findById(roomId);
-    if (gameRoom == null)
-      throw new NotFoundGameRoomException();
-
+    GameRoom gameRoom = getGameRoomOrFail(roomId);
 
     gameRoom.validateHost(userId);
     checkMinUser(gameRoom);
@@ -189,7 +180,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public void gameCountdown(String roomId, String event) {
-    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    GameRoom gameRoom = getGameRoomOrFail(roomId);
     long delay = 1000L; // 1초후 실행
     long period = 1000L; // 1초마다 실행
     Timer timer = new Timer();
@@ -221,10 +212,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public GameRoom vote(String roomId, String userId, String voteTo) {
-    GameRoom gameRoom = gameRoomRepository.findById(roomId);
-    if (gameRoom == null) {
-      throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
-    }
+    GameRoom gameRoom = getGameRoomOrFail(roomId);
 
     if (!gameRoom.getGameStatus().equals(GameStatus.VOTE)) {
       throw new IllegalStateException("현재 투표 진행 중이 아닙니다.");
@@ -275,17 +263,14 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public boolean checkVoteComplete(String roomId) {
-    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    GameRoom gameRoom = getGameRoomOrFail(roomId);
 
     return gameRoom.getVoteCompleteCount() == gameRoom.getUsers().size();
   }
 
   @Override
   public boolean checkAnswer(String roomId, String userId, String choice) {
-    GameRoom gameRoom = gameRoomRepository.findById(roomId);
-    if (gameRoom == null) {
-      throw new NotFoundGameRoomException("방이 존재하지 않습니다.");
-    }
+    GameRoom gameRoom = getGameRoomOrFail(roomId);
 
     isLiar(gameRoom, userId);
     return isSame(gameRoom, choice);
@@ -293,7 +278,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public GameResultResponseDto getGameResult(String roomId, String userId, String choice) {
-    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+    GameRoom gameRoom = getGameRoomOrFail(roomId);
     User liar = gameRoom.getLiar();
 
     if (liar == null) {
@@ -370,7 +355,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   private void processEndGame(GameRoom gameRoom) {
-    log.info("[✳️게임 종료] 게임이 종료되었습니다. (CODE : {}", gameRoom.getRoomId());
+    log.info("[✳️게임 종료] 게임이 종료되었습니다. (CODE : {})", gameRoom.getRoomId());
     gameRoom.setGameStatus(GameStatus.END);
 
     //방에 속해있는 유저삭제
@@ -379,5 +364,15 @@ public class GameRoomServiceImpl implements GameRoomService {
 
     //방 삭제
     gameRoomRepository.delete(gameRoom.getRoomId());
+  }
+
+  public GameRoom getGameRoomOrFail(String roomId) {
+    GameRoom gameRoom = gameRoomRepository.findById(roomId);
+
+    if (gameRoom == null) {
+      throw new NotFoundGameRoomException("게임 방을 찾을 수 없습니다. roomId : " + roomId);
+    }
+
+    return gameRoom;
   }
 }
