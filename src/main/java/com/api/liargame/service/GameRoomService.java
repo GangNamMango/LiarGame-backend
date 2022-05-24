@@ -36,5 +36,4 @@ public interface GameRoomService {
 
   boolean checkAnswer(String roomId, String userId, String choice);
 
-  void checkMinUser(String gameRoom);
 }
