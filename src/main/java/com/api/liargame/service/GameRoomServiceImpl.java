@@ -134,9 +134,9 @@ public class GameRoomServiceImpl implements GameRoomService {
     if (gameRoom == null)
       throw new NotFoundGameRoomException();
 
-    checkMinUser(gameRoom);
 
     gameRoom.validateHost(userId);
+    checkMinUser(gameRoom);
 
     String topic = wordRepository.resetTopic(gameRoom.getSetting().getTopic());
     String word = wordRepository.findWordByTopic(topic);
