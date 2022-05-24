@@ -7,6 +7,7 @@
 <p align="center"><img src="https://user-images.githubusercontent.com/78775910/170033090-e4ce4cf8-7a05-4d6d-a664-e8ac9c89104b.png" width=80%></p>
 <p align="center"><img src="https://user-images.githubusercontent.com/78775910/170033122-3c52f26c-942a-4c7d-a362-8fd11e3c1cfc.png" width=80%></p>
 <p align="center"><img src="https://user-images.githubusercontent.com/78775910/170033136-c2f3893d-35e5-4aa8-86c6-5b5367b9b27f.png" width=80%></p>
+
 >**`라이어게임`** 은 **`거짓말쟁이를 찾는`** 게임입니다.
 >
 >한 방에 있는 사람 중 라이어를 제외한 참여자는 제시어 카드를 받고 해당 제시어를 설명합니다. 
