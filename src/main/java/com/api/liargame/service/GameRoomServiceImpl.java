@@ -131,9 +131,9 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Override
   public Info createGameInfo(String roomId, String userId) {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
-    if (gameRoom == null) 
+    if (gameRoom == null)
       throw new NotFoundGameRoomException();
-    
+
     checkMinUser(gameRoom);
 
     gameRoom.validateHost(userId);
@@ -359,6 +359,6 @@ public class GameRoomServiceImpl implements GameRoomService {
   private void checkMinUser(GameRoom gameRoom) {
     Integer totalMember = gameRoom.getUsers().size();
     if (totalMember < GameRoomConstant.ROOM_MIN_USER)
-      throw new IllegalStateException("게임을 시작하기 위한 최소 인원은 " + GameRoomConstant.ROOM_ID_LENGTH + "명 입니다.");
+      throw new IllegalStateException("게임을 시작하기 위한 최소 인원은 " + GameRoomConstant.ROOM_MIN_USER + "명 입니다.");
   }
 }

@@ -3,6 +3,7 @@ package com.api.liargame.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.api.liargame.constants.GameRoomConstant;
 import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.GameStatus;
 import com.api.liargame.domain.Setting;
@@ -10,6 +11,7 @@ import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
 import com.api.liargame.repository.GameRoomRepository;
 import com.api.liargame.repository.UserRepository;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,18 +44,27 @@ public class VoteTest {
     gameRoomRepository.save(gameRoom);
   }
 
+  User createUser() {
+    User user = new User(UUID.randomUUID().toString(), Role.GUEST, "0");
+    userRepository.save(user);
+
+    return user;
+  }
+
   @Test
   @DisplayName("투표가능")
   void vote_success() {
-    User user = new User("user", Role.GUEST, "ch1");
-    userRepository.save(user);
-    gameRoom.addUser(user);
+    for (int i=0; i< GameRoomConstant.ROOM_MIN_USER; i++) {
+      User user = createUser();
+      gameRoom.addUser(user);
+    }
+
 
     gameRoomService.createGameInfo("roomId", host.getId());
     gameRoom.setGameStatus(GameStatus.VOTE);
-    gameRoomService.vote(gameRoom.getRoomId(), user.getId(), "host");
+    gameRoomService.vote(gameRoom.getRoomId(), host.getId(), "host");
 
-    assertThat(user.isVote()).isEqualTo(true);
+    assertThat(host.isVote()).isEqualTo(true);
     assertThat(host.getVoteCount()).isEqualTo(1);
     assertThat(gameRoom.getVoteCompleteCount()).isEqualTo(1);
   }
@@ -61,16 +72,17 @@ public class VoteTest {
   @Test
   @DisplayName("이미 투표한 유저는 투표 할 수 없어야 한다.")
   void vote_fail_when_already_vote() {
-    User user = new User("user", Role.GUEST, "ch1");
-    userRepository.save(user);
-    gameRoom.addUser(user);
+    for (int i=0; i< GameRoomConstant.ROOM_MIN_USER; i++) {
+      User user = createUser();
+      gameRoom.addUser(user);
+    }
 
     gameRoomService.createGameInfo("roomId", host.getId());
     gameRoom.setGameStatus(GameStatus.VOTE);
-    gameRoomService.vote(gameRoom.getRoomId(), user.getId(), "host");
+    gameRoomService.vote(gameRoom.getRoomId(), host.getId(), "host");
 
     assertThrows(IllegalStateException.class, () -> {
-      gameRoomService.vote(gameRoom.getRoomId(), user.getId(), "host");
+      gameRoomService.vote(gameRoom.getRoomId(), host.getId(), "host");
     });
   }
 
