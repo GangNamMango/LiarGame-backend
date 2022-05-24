@@ -133,7 +133,7 @@ class GameRoomServiceTest {
     userRepository.save(user);
 
     gameRoom.addUser(user);
-    User leavedUser = gameRoomService.leave(roomId, user.getId());
+    User leavedUser = gameRoomService.leave(gameRoom, user.getId());
 
     GameRoom updatedGameRoom = gameRoomRepository.findById(roomId);
     User foundUser = userRepository.findById(user.getId());
@@ -160,7 +160,7 @@ class GameRoomServiceTest {
     gameRoom.addUser(user2);
 
     String originalHostId = gameRoom.getHost().getId();
-    gameRoomService.leave(gameRoom.getRoomId(), originalHostId);
+    gameRoomService.leave(gameRoom, originalHostId);
 
     GameRoom foundGameRoom = gameRoomRepository.findById(gameRoom.getRoomId());
     User leavedUser = userRepository.findById(originalHostId);
@@ -179,7 +179,7 @@ class GameRoomServiceTest {
     userRepository.save(host);
     gameRoomRepository.save(gameRoom);
 
-    User leavedUser = gameRoomService.leave(gameRoom.getRoomId(), host.getId());
+    User leavedUser = gameRoomService.leave(gameRoom, host.getId());
     GameRoom foundGameRoom = gameRoomRepository.findById(gameRoom.getRoomId());
     User foundUser = userRepository.findById(host.getId());
 
