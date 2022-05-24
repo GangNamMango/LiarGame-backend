@@ -95,8 +95,8 @@ public class GameRoomController {
   public ResponseDto<?> leave(@Payload LeaveRequestDto leaveRequestDto) {
     String roomId = leaveRequestDto.getRoomId();
     String userId = leaveRequestDto.getUserId();
-    User leavedUser = gameRoomService.leave(roomId, userId);
     GameRoom gameRoom = gameRoomService.getGameRoomOrFail(roomId);
+    User leavedUser = gameRoomService.leave(gameRoom, userId);
 
     GameRoomResponseDto gameRoomResponse = new GameRoomResponseDto(gameRoom);
 
@@ -116,8 +116,8 @@ public class GameRoomController {
     String roomId = exitRequestDto.getRoomId();
     String userId = exitRequestDto.getUserId();
 
-    User exitUser = gameRoomService.exit(roomId, userId);
     GameRoom gameRoom = gameRoomService.getGameRoomOrFail(roomId);
+    User exitUser = gameRoomService.exit(gameRoom, userId);
 
     if (gameRoom.getGameStatus().equals(GameStatus.END)) {
       gameRoomService.processEndGame(gameRoom);

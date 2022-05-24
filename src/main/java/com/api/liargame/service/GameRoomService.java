@@ -16,9 +16,9 @@ public interface GameRoomService {
 
   GameRoom find(String roomId);
 
-  User leave(String roomId, String userId);
+  User leave(GameRoom gameRoom, String userId);
 
-  User exit(String roomId, String userId);
+  User exit(GameRoom gameRoom, String userId);
 
   User updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto);
 

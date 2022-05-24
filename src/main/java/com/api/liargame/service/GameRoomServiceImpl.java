@@ -86,8 +86,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   @Override
-  public User leave(String roomId, String userId) {
-    GameRoom gameRoom = getGameRoomOrFail(roomId);
+  public User leave(GameRoom gameRoom, String userId) {
     User user = userRepository.findById(userId);
 
     if (user == null) {
@@ -117,11 +116,9 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   @Override
-  public User exit(String roomId, String userId) {
-    GameRoom gameRoom = getGameRoomOrFail(roomId);
+  public User exit(GameRoom gameRoom, String userId) {
     User user = isExistUserInGame(userId, gameRoom);
 
-    //TODO : 추후 3 -> GameRoomConstant로 바꾸기
     if (user.getGameRole().equals(LIAR) || gameRoom.getUserCount() - 1 < GameRoomConstant.ROOM_MIN_USER) {
       //게임종료 처리
       gameRoom.setGameStatus(GameStatus.END);
@@ -384,12 +381,15 @@ public class GameRoomServiceImpl implements GameRoomService {
     log.info("[✳️게임 종료] 게임이 종료되었습니다. (CODE : {})", gameRoom.getRoomId());
     gameRoom.setGameStatus(GameStatus.END);
 
-    //방에 속해있는 유저삭제
-    gameRoom.getUsers()
-        .forEach(u -> userRepository.delete(u.getId()));
+    clearUsersInGame(gameRoom);
 
     //방 삭제
     gameRoomRepository.delete(gameRoom.getRoomId());
+  }
+
+  private void clearUsersInGame(GameRoom gameRoom) {
+    gameRoom.getUsers()
+        .forEach(u -> userRepository.delete(u.getId()));
   }
 
   @Override
