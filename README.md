@@ -51,6 +51,5 @@
 >Notion
 >[프로젝트 과정이 궁금하다면?](https://www.notion.so/7288a41786ed410899ab1ddbd4e80a75)
 
-## pages
 
 
