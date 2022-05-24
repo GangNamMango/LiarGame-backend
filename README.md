@@ -1,7 +1,4 @@
-<div align="center">
-<p align="center"><img src="https://user-images.githubusercontent.com/78775910/168646594-ba28efef-593d-4b9d-a18d-45c3aaa113f1.png" width=30%></p>
 
-</div>
 
 ## 프로젝트 소개
 <p align="center"><img src="https://user-images.githubusercontent.com/78775910/170033090-e4ce4cf8-7a05-4d6d-a664-e8ac9c89104b.png" width=80%></p>
