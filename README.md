@@ -21,7 +21,7 @@
 >
 >지금 바로 플레이해보세요!
 >
->[라이어게임 - 술자리게임, 인싸게임](http://hyumapr.dothome.co.kr/){:target="_blank"}
+>[라이어게임 - 술자리게임, 인싸게임](http://hyumapr.dothome.co.kr/)
 
 <br/>
 
