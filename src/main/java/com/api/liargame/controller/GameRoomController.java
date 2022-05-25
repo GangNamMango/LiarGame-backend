@@ -98,31 +98,10 @@ public class GameRoomController {
     GameRoom gameRoom = gameRoomService.getGameRoomOrFail(roomId);
     User leavedUser = gameRoomService.leave(gameRoom, userId);
 
-    GameRoomResponseDto gameRoomResponse = new GameRoomResponseDto(gameRoom);
-
-    ResponseDto<?> socketResponse = ResponseDto.<List<UserResponseDto>>builder()
-        .status(ResponseStatus.SUCCESS)
-        .message(leavedUser.getNickname() + "님이 대기실을 나갔습니다.")
-        .data(gameRoomResponse.getUsers())
-        .build();
-
-    webSocket.convertAndSend("/sub/game/leave/" + roomId, socketResponse);
-
-    return socketResponse;
-  }
-
-  @MessageMapping("/exit")
-  public ResponseDto<?> exit(@Payload LeaveRequestDto exitRequestDto) {
-    String roomId = exitRequestDto.getRoomId();
-    String userId = exitRequestDto.getUserId();
-
-    GameRoom gameRoom = gameRoomService.getGameRoomOrFail(roomId);
-    User exitUser = gameRoomService.exit(gameRoom, userId);
-
     if (gameRoom.getGameStatus().equals(GameStatus.END)) {
       gameRoomService.processEndGame(gameRoom);
 
-      GameResultResponseDto gameResultResponseDto = GameResultResponseDto.ofGameExit(gameRoom, exitUser);
+      GameResultResponseDto gameResultResponseDto = GameResultResponseDto.ofGameExit(gameRoom, leavedUser);
 
       ResponseDto<?> endResultResponse = ResponseDto.builder()
           .status(ResponseStatus.SUCCESS)
@@ -141,11 +120,11 @@ public class GameRoomController {
 
     ResponseDto<?> socketResponse = ResponseDto.<List<UserResponseDto>>builder()
         .status(ResponseStatus.SUCCESS)
-        .message(exitUser.getNickname() + "님이 게임을 나갔습니다.")
+        .message(leavedUser.getNickname() + "님이 게임을 나갔습니다.")
         .data(userResponseList)
         .build();
 
-    webSocket.convertAndSend("/sub/game/exit/" + roomId, socketResponse);
+    webSocket.convertAndSend("/sub/game/leave/" + roomId, socketResponse);
     return socketResponse;
   }
 

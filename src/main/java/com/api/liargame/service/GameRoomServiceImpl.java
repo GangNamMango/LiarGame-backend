@@ -87,17 +87,35 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public User leave(GameRoom gameRoom, String userId) {
-    User user = userRepository.findById(userId);
+    User user = isExistUserInGame(userId, gameRoom);
 
-    if (user == null) {
-      throw new IllegalStateException("유저를 찾을 수 없습니다.");
+    GameStatus gameStatus = gameRoom.getGameStatus();
+
+    if (gameStatus.equals(GameStatus.WAITING)) {
+      leaveWhenWaitingRoom(gameRoom, user);
+    } else {
+      leaveWhenInGame(gameRoom, user);
     }
 
+    gameRoom.deleteUser(user);
+    gameRoom.update();
+    userRepository.delete(user.getId());
+
+    return user;
+  }
+
+  private void leaveWhenInGame(GameRoom gameRoom, User user) {
+    if (user.getGameRole().equals(LIAR) || gameRoom.getUserCount() - 1 < GameRoomConstant.ROOM_MIN_USER) {
+      gameRoom.setGameStatus(GameStatus.END);
+    }
+  }
+
+  private void leaveWhenWaitingRoom(GameRoom gameRoom, User user) {
     if (user.getRole() == Role.HOST) {
       Optional<User> nextHost = gameRoom
           .getUsers()
           .stream()
-          .filter(u -> !u.getId().equals(userId))
+          .filter(u -> !u.getId().equals(user.getId()))
           .findAny();
 
       if (nextHost.isPresent()) {
@@ -106,29 +124,6 @@ public class GameRoomServiceImpl implements GameRoomService {
         gameRoomRepository.delete(gameRoom.getRoomId());
       }
     }
-
-    gameRoom.deleteUser(user);
-    gameRoom.update();
-
-    userRepository.delete(user.getId());
-
-    return user;
-  }
-
-  @Override
-  public User exit(GameRoom gameRoom, String userId) {
-    User user = isExistUserInGame(userId, gameRoom);
-
-    if (user.getGameRole().equals(LIAR) || gameRoom.getUserCount() - 1 < GameRoomConstant.ROOM_MIN_USER) {
-      //게임종료 처리
-      gameRoom.setGameStatus(GameStatus.END);
-    }
-
-    gameRoom.deleteUser(user);
-    gameRoom.update();
-    userRepository.delete(user.getId());
-
-    return user;
   }
 
   @Override

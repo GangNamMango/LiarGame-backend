@@ -18,8 +18,6 @@ public interface GameRoomService {
 
   User leave(GameRoom gameRoom, String userId);
 
-  User exit(GameRoom gameRoom, String userId);
-
   User updateUserProfile(UpdateProfileRequestDto updateProfileRequestDto);
 
   Info createGameInfo(String roomId, String userId);
