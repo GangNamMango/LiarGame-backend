@@ -14,7 +14,7 @@ public class VoteResponseDto {
   private final Integer maxVoteCount;
   private final Integer currentVoteCount;
   private final List<String> completed;
-  private final List<String> noteCompleted;
+  private final List<String> notCompleted;
 
   @Builder
   public VoteResponseDto(String gameStatus, Integer maxVoteCount, Integer currentVoteCount,
@@ -23,7 +23,7 @@ public class VoteResponseDto {
     this.maxVoteCount = maxVoteCount;
     this.currentVoteCount = currentVoteCount;
     this.completed = completed;
-    this.noteCompleted = noteCompleted;
+    this.notCompleted = noteCompleted;
   }
 
   public static VoteResponseDto of(GameStatus gameStatus, GameRoom gameRoom) {
