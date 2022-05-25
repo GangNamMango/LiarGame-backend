@@ -41,12 +41,11 @@ public class MemoryGameRoomRepository implements GameRoomRepository {
       return;
     }
 
+    gameRoomMemory.remove(roomId);
+
     log.info("[❎방 삭제] 방이 삭제되었습니다. (CODE : {}, HOST : {})", gameRoom.getRoomId(),
         gameRoom.getHost().getNickname());
-
     printGameRoom();
-
-    gameRoomMemory.remove(roomId);
   }
 
   @Override
