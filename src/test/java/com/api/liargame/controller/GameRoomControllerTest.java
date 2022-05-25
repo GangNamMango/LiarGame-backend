@@ -9,6 +9,7 @@ import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
+import com.api.liargame.global.SlackLogger;
 import com.api.liargame.repository.GameRoomRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
@@ -36,6 +38,9 @@ class GameRoomControllerTest {
 
   @Autowired
   private GameRoomRepository gameRoomRepository;
+
+  @MockBean
+  private SlackLogger slackLogger;
 
 
   private final static ObjectMapper objectMapper = new ObjectMapper();

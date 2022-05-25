@@ -6,17 +6,32 @@ import com.api.liargame.domain.GameRoom;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
-
+import com.api.liargame.global.SlackLogger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class MemoryGameRoomRepositoryTest {
 
-  GameRoomRepository gameRoomRepository = new MemoryGameRoomRepository();
+  @InjectMocks
+  MemoryGameRoomRepository gameRoomRepository;
+
+  @Mock
+  SlackLogger slackLogger;
+
   @BeforeEach
   void repository_clear() {
     gameRoomRepository.clear();
+
+    Mockito.mock(SlackLogger.class);
+
+    gameRoomRepository = new MemoryGameRoomRepository(slackLogger);
   }
 
   @Test

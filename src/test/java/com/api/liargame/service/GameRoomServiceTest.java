@@ -4,11 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.regex.Pattern;
-
 import com.api.liargame.constants.GameRoomConstant;
 import com.api.liargame.constants.SettingConstant;
-import com.api.liargame.controller.dto.request.ChoiceRequestDto;
 import com.api.liargame.controller.dto.request.EnterRequestDto;
 import com.api.liargame.controller.dto.request.UpdateProfileRequestDto;
 import com.api.liargame.controller.dto.request.UserRequestDto;
@@ -20,16 +17,16 @@ import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
 import com.api.liargame.exception.DuplicateUserNicknameException;
 import com.api.liargame.exception.NotFoundGameRoomException;
+import com.api.liargame.global.SlackLogger;
 import com.api.liargame.repository.GameRoomRepository;
 import com.api.liargame.repository.UserRepository;
 import com.api.liargame.repository.WordRepository;
-
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.matchers.GreaterThan;
-import org.mockito.internal.matchers.LessThan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 
 @SpringBootTest
@@ -41,6 +38,8 @@ class GameRoomServiceTest {
   GameRoomRepository gameRoomRepository;
   @Autowired
   UserRepository userRepository;
+  @MockBean
+  SlackLogger slackLogger;
 
   @Autowired
   WordRepository wordRepository;

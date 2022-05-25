@@ -9,6 +9,7 @@ import com.api.liargame.domain.GameStatus;
 import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
+import com.api.liargame.global.SlackLogger;
 import com.api.liargame.repository.GameRoomRepository;
 import com.api.liargame.repository.UserRepository;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
 public class VoteTest {
@@ -27,6 +29,8 @@ public class VoteTest {
   UserRepository userRepository;
   @Autowired
   GameRoomRepository gameRoomRepository;
+  @MockBean
+  SlackLogger slackLogger;
 
 
   User host;

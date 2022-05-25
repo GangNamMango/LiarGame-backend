@@ -10,6 +10,7 @@ import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
 import com.api.liargame.exception.SettingPermissionException;
+import com.api.liargame.global.SlackLogger;
 import com.api.liargame.repository.GameRoomRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
 public class SettingServiceTest {
@@ -29,6 +31,9 @@ public class SettingServiceTest {
 
     @Autowired
     GameRoomRepository gameRoomRepository;
+
+    @MockBean
+    SlackLogger slackLogger;
 
     GameRoom room;
     User host;
