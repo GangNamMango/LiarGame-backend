@@ -18,6 +18,7 @@ import com.api.liargame.domain.Setting;
 import com.api.liargame.domain.User;
 import com.api.liargame.domain.User.Role;
 import com.api.liargame.exception.NotFoundGameRoomException;
+import com.api.liargame.global.SlackLogger;
 import com.api.liargame.repository.GameRoomRepository;
 import com.api.liargame.repository.UserRepository;
 import com.api.liargame.repository.WordRepository;
@@ -42,6 +43,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   private final UserRepository userRepository;
   private final SimpMessagingTemplate webSocket;
   private final WordRepository wordRepository;
+  private final SlackLogger slackLogger;
 
   @Override
   public GameRoom createRoom(UserRequestDto userRequestDto) {
@@ -105,7 +107,8 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   private void leaveWhenInGame(GameRoom gameRoom, User user) {
-    if (user.getGameRole().equals(LIAR) || gameRoom.getUserCount() - 1 < GameRoomConstant.ROOM_MIN_USER) {
+    if (user.getGameRole().equals(LIAR)
+        || gameRoom.getUserCount() - 1 < GameRoomConstant.ROOM_MIN_USER) {
       gameRoom.setGameStatus(GameStatus.END);
     }
   }
@@ -157,6 +160,10 @@ public class GameRoomServiceImpl implements GameRoomService {
     gameRoom.setInfo(gameInfo);
 
     gameRoom.setGameStatus(GameStatus.PROGRESS);
+
+    slackLogger.send(
+        String.format("[❇️게임시작] 게임을 시작했습니다. (방 번호 : %s, 현재 인원 : %d)", gameRoom.getRoomId(),
+            gameRoom.getUserCount()));
 
     return gameInfo;
   }
@@ -249,6 +256,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
     return gameRoom;
   }
+
   private User isExistUserInGame(String userId, GameRoom gameRoom) {
     User user = userRepository.findById(userId);
     if (user == null) {
@@ -275,7 +283,6 @@ public class GameRoomServiceImpl implements GameRoomService {
     String gameRoomWord = gameRoom.getInfo().getWord();
     return gameRoomWord.equals(liarWord);
   }
-
 
 
   @Override
@@ -312,7 +319,8 @@ public class GameRoomServiceImpl implements GameRoomService {
     }
   }
 
-  private GameResultResponseDto getChoiceWinner(GameRoom gameRoom, String userId, String choice, User liar) {
+  private GameResultResponseDto getChoiceWinner(GameRoom gameRoom, String userId, String choice,
+      User liar) {
     //라이어의 승리
     if (checkAnswer(gameRoom.getRoomId(), userId, choice)) {
       processEndGame(gameRoom);
@@ -366,14 +374,17 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   private void checkMinUser(GameRoom gameRoom) {
     Integer totalMember = gameRoom.getUsers().size();
-    if (totalMember < GameRoomConstant.ROOM_MIN_USER)
+    if (totalMember < GameRoomConstant.ROOM_MIN_USER) {
       throw new IllegalStateException(
           "게임을 시작하기 위한 최소 인원은 " + GameRoomConstant.ROOM_MIN_USER + "명 입니다.");
+    }
   }
 
   @Override
   public void processEndGame(GameRoom gameRoom) {
     log.info("[✳️게임 종료] 게임이 종료되었습니다. (CODE : {})", gameRoom.getRoomId());
+    slackLogger.send(String.format("[✳️게임 종료] 게임이 종료되었습니다. (방 번호 : %s)", gameRoom.getRoomId()));
+
     gameRoom.setGameStatus(GameStatus.END);
 
     clearUsersInGame(gameRoom);
