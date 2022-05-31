@@ -403,7 +403,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     GameRoom gameRoom = gameRoomRepository.findById(roomId);
 
     if (gameRoom == null) {
-      throw new NotFoundGameRoomException("게임 방을 찾을 수 없습니다. roomId : " + roomId);
+      throw new NotFoundGameRoomException("게임 방을 찾을 수 없습니다.");
     }
 
     return gameRoom;

@@ -3,7 +3,7 @@ package com.api.liargame.exception;
 public class DuplicateUserNicknameException extends RuntimeException{
 
   public DuplicateUserNicknameException() {
-    super("Duplicate User Nickname");
+    super("방에 중복된 닉네임이 있습니다.");
   }
 
   public DuplicateUserNicknameException(String message) {
